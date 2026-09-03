@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://web-auth.ziptoapk.in https://generativelanguage.googleapis.com https://raw.githubusercontent.com; media-src 'self' blob:; worker-src 'self' blob:;">
+<title>ZipToApk — Turn any project zip into a working APK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+html,body{margin:0;padding:0;}
+body{background:#0a0d12;-webkit-font-smoothing:antialiased;}
+
+  :root{
+    --bg: #0a0d12;
+    --surface: #12161d;
+    --surface-2: #191f28;
+    --line: #232b36;
+    --text: #e7e9ee;
+    --muted: #8992a3;
+    --amber: #f2a73b;
+    --mint: #48e5a0;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --disp: 'Space Grotesk', 'Inter', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+#landingRoot * { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+#landingRoot {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+#landingRoot a { color: inherit; text-decoration:none; }
+#landingRoot .noise {
+    position: fixed; inset:0; pointer-events:none; z-index: 1;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+#landingRoot .wrap { max-width: 1120px; margin:0 auto; padding: 0 28px; position:relative; z-index:2; }
+#landingRoot /* scroll reveal */
+  .rv { opacity:0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.16,.84,.44,1), transform .7s cubic-bezier(.16,.84,.44,1); }
+#landingRoot .rv.in { opacity:1; transform:none; }
+#landingRoot /* ---------- NAV ---------- */
+  header {
+    position: sticky; top:0; z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(10,13,18,0.72);
+    border-bottom: 1px solid var(--line);
+  }
+#landingRoot .nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 0;
+  }
+#landingRoot .logo {
+    font-family: var(--mono);
+    font-size: 17px;
+    letter-spacing: -0.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+#landingRoot .logo .bracket { color: var(--amber); }
+#landingRoot .logo .apk { color: var(--mint); }
+#landingRoot nav .links { display:flex; gap: 28px; font-size: 14px; color: var(--muted); }
+#landingRoot nav .links a:hover { color: var(--text); }
+#landingRoot .btn {
+    font-family: var(--mono); font-size: 13px; padding: 10px 18px;
+    border-radius: 8px; border: 1px solid var(--line);
+    display:inline-flex; align-items:center; gap:8px;
+    transition: border-color .2s, transform .15s;
+  }
+#landingRoot .btn:hover { border-color:#3a4454; transform: translateY(-1px); }
+#landingRoot .btn.primary {
+    background: var(--mint); color: #05130c; border-color: var(--mint);
+    font-weight: 600;
+  }
+#landingRoot .btn.primary:hover { box-shadow: 0 0 0 3px rgba(72,229,160,0.18); }
+#landingRoot /* ---------- HERO ---------- */
+  .hero {
+    padding: 96px 0 60px;
+    display:grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items:center;
+  }
+#landingRoot .eyebrow {
+    font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+    text-transform: uppercase; letter-spacing: 0.14em;
+    display:flex; align-items:center; gap:10px; margin-bottom: 22px;
+  }
+#landingRoot .eyebrow::before {
+    content:''; width:7px; height:7px; border-radius:50%;
+    background: var(--amber); box-shadow: 0 0 0 4px rgba(242,167,59,0.15);
+  }
+#landingRoot h1 {
+    font-family: var(--disp); font-weight: 600;
+    font-size: clamp(34px, 4.4vw, 54px);
+    line-height: 1.06; letter-spacing: -0.02em;
+    margin-bottom: 22px;
+  }
+#landingRoot h1 .accent { color: var(--mint); }
+#landingRoot .lede {
+    color: var(--muted); font-size: 17px; max-width: 480px; margin-bottom: 34px;
+  }
+#landingRoot .hero-ctas { display:flex; gap:14px; flex-wrap:wrap; margin-bottom: 28px; }
+#landingRoot .file-hint {
+    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+    display:flex; align-items:center; gap:8px;
+  }
+#landingRoot .file-hint code { color:#b7c0cf; background: var(--surface-2); padding:2px 7px; border-radius:5px; border:1px solid var(--line); }
+#landingRoot /* ---------- PIPELINE VISUAL ---------- */
+  .pipeline {
+    background: var(--surface);
+    border:1px solid var(--line);
+    border-radius: 16px;
+    padding: 26px 22px 20px;
+    position: relative;
+  }
+#landingRoot .pipeline-top {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 20px;
+  }
+#landingRoot .dots { display:flex; gap:6px; }
+#landingRoot .dots span { width:9px; height:9px; border-radius:50%; background: var(--line); }
+#landingRoot .pipeline-label { font-family: var(--mono); font-size:11.5px; color: var(--muted); }
+#landingRoot .stage-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 4px 28px;
+  }
+#landingRoot .stage {
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    width: 88px;
+  }
+#landingRoot .stage-icon {
+    width:56px; height:56px; border-radius: 14px;
+    background: var(--surface-2); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    transition: border-color .3s, box-shadow .3s;
+  }
+#landingRoot .stage-icon svg { width:26px; height:26px; }
+#landingRoot .stage.active .stage-icon {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 4px rgba(242,167,59,0.12);
+  }
+#landingRoot .stage.done .stage-icon {
+    border-color: var(--mint);
+    box-shadow: 0 0 0 4px rgba(72,229,160,0.14);
+  }
+#landingRoot .stage-name { font-family: var(--mono); font-size:11px; color: var(--muted); text-align:center; }
+#landingRoot .stage.active .stage-name, #landingRoot .stage.done .stage-name { color: var(--text); }
+#landingRoot .track {
+    flex:1; height:2px; background: var(--line); position:relative; margin: 0 6px 30px;
+    overflow:hidden; border-radius: 2px;
+  }
+#landingRoot .track .fill {
+    position:absolute; inset:0; width:0%; background: linear-gradient(90deg, var(--amber), var(--mint));
+    transition: width 1.1s cubic-bezier(.4,0,.2,1);
+  }
+#landingRoot .terminal {
+    background:#080a0d; border:1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; font-family: var(--mono); font-size: 12.5px;
+    color: #a7b0bf; min-height: 118px;
+  }
+#landingRoot .terminal .line { opacity:0; transform: translateY(3px); animation: rise .35s forwards; }
+#landingRoot .terminal .ok { color: var(--mint); }
+#landingRoot .terminal .cursor { display:inline-block; width:6px; height:12px; background: var(--amber); vertical-align:middle; animation: blink 1s step-end infinite; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  @keyframes blink{ 50%{ opacity:0; } }
+#landingRoot /* ---------- SECTIONS ---------- */
+  section { padding: 88px 0; border-top: 1px solid var(--line); }
+#landingRoot .section-head { max-width: 580px; margin-bottom: 52px; }
+#landingRoot .section-head .eyebrow { margin-bottom: 14px; }
+#landingRoot h2 {
+    font-family: var(--disp); font-weight:600; font-size: clamp(26px,3vw,34px);
+    letter-spacing:-0.015em; margin-bottom:14px;
+  }
+#landingRoot .section-head p { color: var(--muted); font-size:15.5px; }
+#landingRoot /* ---------- WHAT'S INSIDE THE ZIP (manifest) ---------- */
+  .manifest-grid { display:grid; grid-template-columns: 1fr 1fr; gap:44px; align-items:start; }
+#landingRoot .code-card { background:#080a0d; border:1px solid var(--line); border-radius:14px; padding:22px 24px; font-family:var(--mono); font-size:12.8px; color:#9aa2b1; }
+#landingRoot .code-card .cc-head { font-size:11px; color:var(--muted); margin-bottom:16px; letter-spacing:0.06em; text-transform:uppercase; }
+#landingRoot .code-card .tag { color:#7f9bd1; }
+#landingRoot .code-card .attr { color:var(--amber); }
+#landingRoot .code-card .val { color:var(--mint); }
+#landingRoot .code-card div { padding:3px 0; white-space:pre; }
+#landingRoot .perm-list { display:flex; flex-direction:column; gap:20px; }
+#landingRoot .perm { display:flex; gap:16px; }
+#landingRoot .perm .dot { width:8px; height:8px; border-radius:50%; background:var(--amber); margin-top:8px; flex-shrink:0; }
+#landingRoot .perm h4 { font-family: var(--body); font-size:14.5px; font-weight:600; margin-bottom:4px; }
+#landingRoot .perm p { color:var(--muted); font-size:13.3px; }
+#landingRoot .perm code { font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+#landingRoot /* ---------- HOW IT WORKS (timestamped) ---------- */
+  .steps { display:grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+#landingRoot .step { background: var(--surface); padding: 30px 24px; }
+#landingRoot .step .time { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom:20px; }
+#landingRoot .step h3 { font-family: var(--disp); font-size:18px; font-weight:600; margin-bottom:10px; }
+#landingRoot .step p { color: var(--muted); font-size:14px; }
+#landingRoot .step .out {
+    font-family: var(--mono); font-size: 11px; color: var(--mint);
+    background: rgba(72,229,160,0.08); border:1px solid rgba(72,229,160,0.25);
+    display:inline-block; padding: 3px 8px; border-radius:6px; margin-top:16px;
+  }
+#landingRoot /* ---------- FEATURES ---------- */
+  .grid-features { display:grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+#landingRoot .feature { background: var(--surface); padding: 28px 24px; transition: background .25s; }
+#landingRoot .feature:hover { background: var(--surface-2); }
+#landingRoot .feature svg { width:22px; height:22px; color: var(--amber); margin-bottom:16px; }
+#landingRoot .feature h3 { font-family: var(--disp); font-size:16px; font-weight:600; margin-bottom:8px; }
+#landingRoot .feature p { color: var(--muted); font-size:13.5px; }
+#landingRoot /* ---------- SOURCES STRIP ---------- */
+  .sources { display:flex; flex-wrap:wrap; gap:12px; margin-top: 8px; }
+#landingRoot .source-chip {
+    font-family: var(--mono); font-size: 12.5px; color: var(--text);
+    background: var(--surface-2); border:1px solid var(--line);
+    padding: 8px 14px; border-radius: 8px;
+  }
+#landingRoot .source-chip .ext { color: var(--muted); }
+#landingRoot /* ---------- CTA ---------- */
+  .cta-band {
+    border-top:1px solid var(--line);
+    padding: 90px 0;
+    text-align:center;
+  }
+#landingRoot .seal { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:22px; }
+#landingRoot .seal svg { width:22px; height:22px; color: var(--mint); }
+#landingRoot .cta-band h2 { margin-bottom: 16px; }
+#landingRoot .cta-band p { color: var(--muted); margin-bottom: 34px; }
+#landingRoot .cta-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+#landingRoot footer {
+    border-top:1px solid var(--line); padding: 30px 0;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+
+  @media (max-width: 860px){#landingRoot .hero { grid-template-columns: 1fr; padding-top: 64px; }
+#landingRoot .steps, #landingRoot .grid-features { grid-template-columns: 1fr; }
+#landingRoot .manifest-grid { grid-template-columns: 1fr; }
+#landingRoot nav .links { display:none; }
+#landingRoot .stage-name { font-size: 9.5px; }
+  }
+
+  @media (max-width: 600px){
+    #landingRoot { overflow-x:hidden; }
+    #landingRoot .container, #landingRoot section, #landingRoot nav, #landingRoot footer { max-width:100%; }
+    #landingRoot nav { padding-left:14px; padding-right:14px; }
+    #landingRoot .hero { padding-left:14px; padding-right:14px; }
+    #landingRoot .hero h1 { font-size:clamp(34px,11vw,54px); line-height:1.02; overflow-wrap:anywhere; }
+    #landingRoot .hero p { font-size:14px; }
+    #landingRoot .cta-row .btn { width:100%; justify-content:center; }
+    #landingRoot .stage-row { overflow-x:auto; padding-bottom:4px; }
+    #landingRoot .stage { min-width:96px; }
+    #landingRoot .manifest-grid { grid-template-columns:1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){#landingRoot * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+
+
+:root{
+  --app-bg:#0D1117; --app-card:#161B22; --app-card-hover:#21262D;
+  --app-border:rgba(255,255,255,0.10); --app-border-sub:rgba(255,255,255,0.06);
+  --app-blue:#58A6FF; --app-blue-dim:#1F6FEB;
+  --app-green:#238636; --app-green-hi:#2EA043; --app-success:#3FB950;
+  --app-purple:#BC8CFF; --app-warn:#F0883E; --app-danger:#F85149;
+  --app-text:#F0F6FC; --app-text-2:#8B949E; --app-text-3:#6E7681;
+  --app-mono:'JetBrains Mono',ui-monospace,monospace;
+  --app-disp:'Space Grotesk','Inter',sans-serif;
+  --app-body:'Inter',sans-serif;
+}
+#appRoot * {margin:0;padding:0;box-sizing:border-box;}
+#appRoot {background:var(--app-bg);color:var(--app-text);font-family:var(--app-body);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:92px;min-height:100vh;}
+#appRoot a {color:inherit;}
+#appRoot ::-webkit-scrollbar {width:8px;height:8px;}
+#appRoot ::-webkit-scrollbar-thumb {background:var(--app-card-hover);border-radius:4px;}
+#appRoot code, #appRoot .mono {font-family:var(--app-mono);}
+#appRoot /* ---------- TOPBAR ---------- */
+header {position:sticky;top:0;z-index:40;background:rgba(13,17,23,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--app-border-sub);}
+#appRoot .topbar {display:flex;align-items:center;justify-content:space-between;padding:13px 16px;}
+#appRoot .brand {display:flex;align-items:center;gap:9px;}
+#appRoot .brand .mark {width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--app-blue),var(--app-purple));display:flex;align-items:center;justify-content:center;font-family:var(--app-mono);font-weight:700;font-size:14px;color:#05130c;}
+#appRoot .brand .name {font-family:var(--app-disp);font-weight:600;font-size:16px;letter-spacing:-0.01em;}
+#appRoot .brand .sub {font-family:var(--app-mono);font-size:10px;color:var(--app-text-2);display:block;margin-top:-2px;}
+#appRoot .topbar-actions {display:flex;align-items:center;gap:6px;}
+#appRoot .icon-btn {width:34px;height:34px;border-radius:8px;border:1px solid var(--app-border-sub);background:transparent;color:var(--app-text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;}
+#appRoot .icon-btn:active {background:var(--app-card-hover);}
+#appRoot .user-chip {display:flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:20px;border:1px solid var(--app-border);background:var(--app-card);cursor:pointer;font-size:12.5px;font-family:var(--app-mono);}
+#appRoot .user-chip img {width:22px;height:22px;border-radius:50%;}
+#appRoot main {max-width:640px;margin:0 auto;padding:14px 12px;display:flex;flex-direction:column;gap:12px;}
+#appRoot /* ---------- CARD BASE ---------- */
+.card {background:var(--app-card);border:1px solid var(--app-border-sub);border-radius:14px;padding:16px;}
+#appRoot .card-head {display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+#appRoot .card-title {display:flex;align-items:center;gap:9px;font-family:var(--app-disp);font-weight:600;font-size:14.5px;}
+#appRoot .card-title .ic {width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+#appRoot .card-title small {display:block;font-family:var(--app-body);font-weight:400;font-size:11px;color:var(--app-text-2);margin-top:1px;}
+#appRoot .chip {font-family:var(--app-mono);font-size:10.5px;padding:3px 8px;border-radius:6px;border:1px solid var(--app-border);color:var(--app-text-2);}
+#appRoot .chip.blue {color:var(--app-blue);border-color:rgba(88,166,255,0.3);background:rgba(88,166,255,0.08);}
+#appRoot .chip.green {color:var(--app-success);border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08);}
+#appRoot .chip.purple {color:var(--app-purple);border-color:rgba(188,140,255,0.3);background:rgba(188,140,255,0.08);}
+#appRoot .chip.warn {color:var(--app-warn);border-color:rgba(240,136,62,0.3);background:rgba(240,136,62,0.08);}
+#appRoot .chip.red {color:var(--app-danger);border-color:rgba(248,81,73,0.3);background:rgba(248,81,73,0.08);}
+#appRoot .btn {font-family:var(--app-mono);font-size:12px;padding:8px 13px;border-radius:8px;border:1px solid var(--app-border);background:transparent;color:var(--app-text);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s;}
+#appRoot .btn:active {transform:scale(.97);}
+#appRoot .btn:hover {border-color:#3a4454;}
+#appRoot .btn.sm {padding:6px 10px;font-size:11px;}
+#appRoot .btn.primary {background:var(--app-blue-dim);border-color:var(--app-blue-dim);color:#fff;font-weight:600;}
+#appRoot .btn.ghost {color:var(--app-text-2);}
+#appRoot .btn:disabled {opacity:.4;cursor:not-allowed;}
+#appRoot .row {display:flex;gap:8px;flex-wrap:wrap;}
+#appRoot .row.between {justify-content:space-between;align-items:center;}
+#appRoot /* ---------- TARGET REPO CARD ---------- */
+.repo-line {font-family:var(--app-mono);font-size:14px;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+#appRoot .repo-line .owner {color:var(--app-text-2);}
+#appRoot .repo-line .slash {color:var(--app-text-3);}
+#appRoot .repo-line .repo {color:var(--app-blue);font-weight:600;}
+#appRoot .repo-line .branch {margin-left:auto;color:var(--app-purple);font-size:11.5px;display:flex;align-items:center;gap:4px;}
+#appRoot .repo-empty {font-family:var(--app-mono);font-size:12.5px;color:var(--app-text-3);text-align:center;padding:14px;border:1px dashed var(--app-border);border-radius:10px;margin-bottom:10px;}
+#appRoot /* ---------- ZIP DROPZONE ---------- */
+.dropzone {border:1.5px dashed var(--app-border);border-radius:12px;padding:26px 14px;text-align:center;cursor:pointer;transition:.15s;position:relative;}
+#appRoot .dropzone:hover, #appRoot .dropzone.drag {border-color:var(--app-blue);background:rgba(88,166,255,0.05);}
+#appRoot .dropzone .dz-ic {font-size:28px;margin-bottom:8px;}
+#appRoot .dropzone .dz-text {font-size:13px;color:var(--app-text-2);}
+#appRoot .dropzone .dz-sub {font-family:var(--app-mono);font-size:10.5px;color:var(--app-text-3);margin-top:4px;}
+#appRoot .dropzone input {position:absolute;inset:0;opacity:0;cursor:pointer;}
+#appRoot .zip-result {margin-top:12px;}
+#appRoot .zip-file-row {display:flex;align-items:center;gap:10px;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:10px 12px;}
+#appRoot .zip-file-row .fic {font-size:20px;}
+#appRoot .zip-file-row .fname {font-family:var(--app-mono);font-size:12.5px;font-weight:600;}
+#appRoot .zip-file-row .fmeta {font-family:var(--app-mono);font-size:10.5px;color:var(--app-text-2);}
+#appRoot .file-tree {margin-top:10px;max-height:220px;overflow-y:auto;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:10px 12px;font-family:var(--app-mono);font-size:11.5px;color:var(--app-text-2);}
+#appRoot .file-tree .frow {display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+#appRoot .file-tree .frow:last-child {border-bottom:none;}
+#appRoot .file-tree .fpath {color:#9aa2b1;}
+#appRoot .file-tree .fsize {color:var(--app-text-3);}
+#appRoot /* ---------- CI/CD ---------- */
+.build-status {display:flex;align-items:center;gap:10px;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:12px;margin-bottom:10px;}
+#appRoot .build-dot {width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+#appRoot .build-dot.running {background:var(--app-warn);box-shadow:0 0 0 4px rgba(240,136,62,0.18);animation:pulse 1.4s infinite;}
+#appRoot .build-dot.success {background:var(--app-success);box-shadow:0 0 0 4px rgba(63,185,80,0.18);}
+#appRoot .build-dot.failure {background:var(--app-danger);box-shadow:0 0 0 4px rgba(248,81,73,0.18);}
+#appRoot .build-dot.idle {background:var(--app-text-3);}
+@keyframes pulse{50%{opacity:.4;}}
+#appRoot .build-info {flex:1;min-width:0;}
+#appRoot .build-info .btitle {font-family:var(--app-mono);font-size:12.5px;font-weight:600;}
+#appRoot .build-info .bsub {font-family:var(--app-mono);font-size:10.5px;color:var(--app-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#appRoot .artifact-row {display:flex;align-items:center;justify-content:space-between;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:10px 12px;margin-top:8px;}
+#appRoot .artifact-row .aname {font-family:var(--app-mono);font-size:12px;}
+#appRoot .artifact-row .asize {font-family:var(--app-mono);font-size:10px;color:var(--app-text-2);}
+#appRoot /* ---------- AI ASSISTANT ---------- */
+textarea, #appRoot input[type=text], #appRoot input[type=password], #appRoot select {
+  width:100%;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:8px;padding:10px 12px;
+  color:var(--app-text);font-family:var(--app-body);font-size:13px;outline:none;
+}
+#appRoot textarea:focus, #appRoot input:focus, #appRoot select:focus {border-color:var(--app-blue);}
+#appRoot textarea {resize:vertical;min-height:70px;font-family:var(--app-mono);font-size:12.5px;}
+#appRoot .field-label {font-family:var(--app-mono);font-size:10.5px;color:var(--app-text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:block;}
+#appRoot .ai-result {margin-top:10px;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:12px;font-family:var(--app-mono);font-size:12px;color:#c9d1d9;white-space:pre-wrap;max-height:260px;overflow-y:auto;}
+#appRoot /* ---------- CONSOLE ---------- */
+.console {background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:12px;font-family:var(--app-mono);font-size:11.5px;max-height:220px;overflow-y:auto;}
+#appRoot .console .cline {padding:2px 0;color:var(--app-text-2);white-space:pre-wrap;word-break:break-word;}
+#appRoot .console .cline .ts {color:var(--app-text-3);margin-right:8px;}
+#appRoot .console .cline.ok {color:var(--app-success);}
+#appRoot .console .cline.err {color:var(--app-danger);}
+#appRoot .console .cline.warn {color:var(--app-warn);}
+#appRoot .console .cline.info {color:var(--app-blue);}
+#appRoot .console-empty {color:var(--app-text-3);text-align:center;padding:20px 0;}
+#appRoot /* ---------- HISTORY ---------- */
+.hist-row {display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--app-border-sub);}
+#appRoot .hist-row:last-child {border-bottom:none;}
+#appRoot .hist-row .hdot {width:8px;height:8px;border-radius:50%;background:var(--app-success);flex-shrink:0;}
+#appRoot .hist-row .hinfo {flex:1;min-width:0;}
+#appRoot .hist-row .htitle {font-family:var(--app-mono);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#appRoot .hist-row .hsub {font-family:var(--app-mono);font-size:10px;color:var(--app-text-3);}
+#appRoot .empty-note {color:var(--app-text-3);font-size:12.5px;text-align:center;padding:14px 0;font-family:var(--app-mono);}
+#appRoot /* ---------- BOTTOM ACTION BAR ---------- */
+.bottombar {position:fixed;bottom:0;left:0;right:0;background:var(--app-card);border-top:1px solid var(--app-border-sub);padding:12px 14px calc(12px + env(safe-area-inset-bottom));z-index:45;}
+#appRoot .action-btn {width:100%;max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:9px;height:50px;border-radius:12px;border:none;font-family:var(--app-body);font-weight:700;font-size:14px;color:#fff;cursor:pointer;transition:.15s;}
+#appRoot .action-btn:active {transform:scale(.985);}
+#appRoot .action-btn.danger {background:var(--app-danger);}
+#appRoot .action-btn.warn {background:var(--app-warn);}
+#appRoot .action-btn.green {background:var(--app-green);}
+#appRoot .action-btn.busy {background:var(--app-card-hover);color:var(--app-text-2);cursor:not-allowed;}
+#appRoot .spinner {width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+#appRoot .busy .spinner {border-top-color:var(--app-text-2);border-color:rgba(255,255,255,0.1);}
+@keyframes spin{to{transform:rotate(360deg);}}
+#appRoot /* ---------- MODAL ---------- */
+.modal-overlay {position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+#appRoot .modal-overlay.open {display:flex;}
+@media(min-width:640px){#appRoot .modal-overlay {align-items:center;}}
+#appRoot .modal {background:var(--app-card);border:1px solid var(--app-border);border-top-left-radius:18px;border-top-right-radius:18px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:18px 18px 22px;}
+@media(min-width:640px){#appRoot .modal {border-radius:16px;}}
+#appRoot .modal-head {display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+#appRoot .modal-head h3 {font-family:var(--app-disp);font-size:16px;font-weight:600;}
+#appRoot .modal-head p {font-size:12px;color:var(--app-text-2);margin-top:2px;}
+#appRoot .modal .close {background:none;border:none;color:var(--app-text-2);font-size:20px;cursor:pointer;line-height:1;padding:4px;}
+#appRoot .repo-pick-item {display:flex;align-items:center;justify-content:space-between;padding:11px 4px;border-bottom:1px solid var(--app-border-sub);cursor:pointer;}
+#appRoot .repo-pick-item:hover {background:var(--app-card-hover);}
+#appRoot .repo-pick-item .rname {font-family:var(--app-mono);font-size:13px;}
+#appRoot .repo-pick-item .rvis {font-size:9.5px;font-family:var(--app-mono);color:var(--app-text-3);}
+#appRoot .toast-wrap {position:fixed;bottom:98px;left:0;right:0;display:flex;justify-content:center;z-index:110;pointer-events:none;}
+#appRoot .toast {background:#1c2128;border:1px solid var(--app-border);color:var(--app-text);font-size:12.5px;padding:10px 16px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:90%;text-align:center;}
+#appRoot .secret-item {background:#080a0d;border:1px solid rgba(248,81,73,0.25);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-family:var(--app-mono);font-size:11.5px;}
+#appRoot .secret-item .spath {color:var(--app-warn);}
+#appRoot .secret-item .stype {color:var(--app-danger);font-size:10px;}
+#appRoot .divider {height:1px;background:var(--app-border-sub);margin:14px 0;}
+#appRoot .hint {font-size:11.5px;color:var(--app-text-3);line-height:1.5;}
+
+
+
+/* ---------- MOBILE / COMPACT SCREEN HARDENING ---------- */
+#appRoot, #appRoot * { min-width: 0; }
+#appRoot { overflow-x: hidden; width: 100%; }
+#appRoot img, #appRoot svg, #appRoot video, #appRoot canvas { max-width: 100%; }
+#appRoot button, #appRoot a, #appRoot input, #appRoot select, #appRoot textarea { max-width: 100%; }
+#appRoot .topbar { min-width: 0; }
+#appRoot .topbar-actions { min-width: 0; flex-wrap: wrap; justify-content: flex-end; }
+#appRoot .card-head { align-items: flex-start; }
+#appRoot .card-head > .row { justify-content: flex-end; min-width: 0; }
+#appRoot .card-head .card-title { min-width: 0; flex: 1 1 auto; }
+#appRoot .card-title small { white-space: normal; overflow-wrap:anywhere; }
+#appRoot .repo-line .branch { margin-left: auto; max-width: 100%; overflow-wrap:anywhere; }
+#appRoot .zip-file-row, #appRoot .artifact-row, #appRoot .build-status { min-width: 0; flex-wrap: wrap; }
+#appRoot .zip-file-row > div:nth-child(2), #appRoot .artifact-row > div:first-child, #appRoot .build-info { min-width: 0; flex: 1 1 150px; }
+#appRoot .zip-file-row .fname, #appRoot .artifact-row .aname, #appRoot .build-info .btitle, #appRoot .build-info .bsub { overflow-wrap:anywhere; white-space:normal; }
+#appRoot .artifact-row .row, #appRoot .build-status .row { width: 100%; }
+#appRoot .file-tree, #appRoot .console, #appRoot .ai-result, #appRoot .preview-code, #appRoot .code { overflow-x: auto; overflow-wrap:anywhere; word-break:break-word; }
+#appRoot .modal { width: calc(100vw - 16px); max-width: 520px; }
+#appRoot .modal-head > div { min-width: 0; padding-right: 8px; }
+#appRoot .modal-head h3, #appRoot .modal-head p { overflow-wrap:anywhere; }
+#appRoot .row { min-width: 0; }
+#appRoot .row > .btn, #appRoot .row > a.btn { flex: 0 1 auto; max-width: 100%; }
+#appRoot .action-btn { max-width: 100%; }
+
+@media (max-width: 639px) {
+  #appRoot .topbar { padding: 10px 10px; flex-wrap: wrap; gap: 8px; }
+  #appRoot .brand { flex: 1 1 170px; min-width: 0; }
+  #appRoot .brand .name { font-size: 15px; }
+  #appRoot .brand .sub { font-size: 9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #appRoot .topbar-actions { flex: 1 1 100%; width:100%; justify-content:flex-start; overflow:visible; }
+  #appRoot .topbar-actions .btn.sm, #appRoot .topbar-actions .icon-btn { flex: 0 0 auto; }
+  #appRoot main { width:100%; max-width:640px; padding:10px 8px; gap:10px; }
+  #appRoot .card { padding:12px; border-radius:12px; }
+  #appRoot .card-head { flex-wrap:wrap; gap:8px; }
+  #appRoot .card-head > .row { width:100%; justify-content:flex-start; }
+  #appRoot .card-head > .btn { flex:0 0 auto; }
+  #appRoot .card-title { font-size:13.5px; }
+  #appRoot .card-title .ic { width:26px; height:26px; }
+  #appRoot .repo-line { font-size:12px; padding:10px; }
+  #appRoot .repo-line .branch { margin-left:0; width:100%; }
+  #appRoot .dropzone { padding:22px 10px; }
+  #appRoot .dropzone .dz-text { font-size:12px; }
+  #appRoot .btn { font-size:11px; padding:8px 10px; }
+  #appRoot .btn.sm { font-size:10.5px; padding:6px 8px; }
+  #appRoot textarea { min-height:86px; }
+  #appRoot .artifact-row { align-items:flex-start; }
+  #appRoot .artifact-row > .btn { flex:1 1 120px; justify-content:center; }
+  #appRoot .modal { max-height:92vh; padding:14px 12px 18px; }
+  #appRoot .modal-head h3 { font-size:15px; }
+  #appRoot .modal-head p { font-size:11px; }
+  #appRoot .bottombar { padding-left:8px; padding-right:8px; }
+  #appRoot .action-btn { height:48px; font-size:13px; }
+}
+
+@media (max-width: 380px) {
+  #appRoot .topbar-actions .btn.sm { padding-left:7px; padding-right:7px; }
+  #appRoot .brand .sub { display:none; }
+  #appRoot .card { padding:10px; }
+  #appRoot .card-title { font-size:13px; }
+  #appRoot .card-title small { font-size:10px; }
+  #appRoot .row > .btn, #appRoot .row > a.btn { flex:1 1 auto; justify-content:center; }
+  #appRoot .card-head > .btn { flex:0 1 auto; }
+}
+
+/* ---------- GLUE: view switching ---------- */
+#appRoot{display:none;}
+body.app-active #landingRoot{display:none;}
+body.app-active #appRoot{display:block;}
+
+/* ---------- App back-to-site bar ---------- */
+#appRoot .back-to-site{display:flex;align-items:center;gap:8px;background:rgba(240,136,62,0.08);border:1px solid rgba(240,136,62,0.25);color:#F0883E;font-family:var(--app-mono);font-size:11.5px;padding:9px 14px;border-radius:10px;margin:10px 12px 0;cursor:pointer;}
+#appRoot .back-to-site:active{opacity:0.8;}
+
+
+#appRoot .live-progress{margin-top:10px;background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:11px 12px;}
+#appRoot .live-progress .pct-row{display:flex;justify-content:space-between;align-items:center;font-family:var(--app-mono);font-size:11px;color:var(--app-text-2);margin-bottom:7px;}
+#appRoot .live-progress .pct{color:var(--app-success);font-weight:700;}
+#appRoot .live-progress .bar{height:7px;background:#1b2028;border-radius:99px;overflow:hidden;}
+#appRoot .live-progress .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--app-blue),var(--app-success));transition:width .5s ease;}
+#appRoot .live-progress .step{margin-top:7px;font-family:var(--app-mono);font-size:10px;color:var(--app-text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#landingRoot .nav-actions{display:flex;align-items:center;gap:7px;}
+
+#appRoot .oauth-box{background:#0b1016;border:1px solid var(--app-border);border-radius:12px;padding:14px;margin-bottom:14px;}
+#appRoot .oauth-title{font-family:var(--app-mono);font-size:12px;font-weight:700;margin-bottom:6px;color:var(--app-text);}.oauth-divider{display:flex;align-items:center;gap:8px;color:var(--app-text-3);font:10px var(--app-mono);margin:14px 0}.oauth-divider:before,.oauth-divider:after{content:"";height:1px;background:var(--app-border);flex:1}.device-code{font:700 22px var(--app-mono);letter-spacing:3px;color:var(--app-success);background:#070a0d;border:1px dashed var(--app-success);border-radius:10px;padding:12px;text-align:center;margin-top:12px}.oauth-status{font:10px var(--app-mono);color:var(--app-text-2);margin-top:9px}.ai-change{background:#080a0d;border:1px solid var(--app-border-sub);border-radius:10px;padding:10px;margin-top:8px}.ai-change .path{font:11px var(--app-mono);font-weight:700}.ai-change .summary{font-size:11px;color:var(--app-text-2);margin-top:3px}.ai-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+
+/* SOURCE-COMPARED GUIDE / STATUS / CONFIRMATION UI */
+.guide-list details{border:1px solid var(--app-border);border-radius:10px;margin:7px 0;background:#0b0e12;padding:0 11px}.guide-list summary{cursor:pointer;padding:12px 2px;font-family:var(--app-mono);font-size:11px}.guide-list p{color:var(--app-text-2);font-size:11.5px;line-height:1.65;padding:0 2px 12px}.source-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--app-border);border-radius:999px;padding:5px 9px;font:9px var(--app-mono);color:var(--app-text-2)}.danger-box{border:1px solid rgba(248,81,73,.35);background:rgba(248,81,73,.06);padding:12px;border-radius:10px}.success-box{border:1px solid rgba(63,185,80,.3);background:rgba(63,185,80,.06);padding:12px;border-radius:10px}.preview-code{background:#07090c;border:1px solid var(--app-border);border-radius:8px;padding:10px;max-height:320px;overflow:auto;white-space:pre;font:10px/1.55 var(--app-mono);color:#c8d1dc}.mini-bar{height:7px;background:#242b34;border-radius:99px;overflow:hidden}.mini-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--app-warn),var(--app-success));transition:.4s}
+
+/* ================= MOBILE-FIRST LAYOUT PATCH ================= */
+#appRoot{width:100%;max-width:100%;overflow-x:clip;isolation:isolate;}
+#appRoot main{width:100%;max-width:640px;margin-inline:auto;}
+#appRoot .topbar{width:100%;max-width:100%;}
+#appRoot .card,#appRoot .card-head,#appRoot .card-title,#appRoot .row,#appRoot .repo-line,#appRoot .build-status,#appRoot .artifact-row,#appRoot .zip-file-row{min-width:0;}
+#appRoot .card{contain:layout paint;}
+#appRoot .card-head{min-width:0;}
+#appRoot .card-title{min-width:0;line-height:1.25;}
+#appRoot .card-title>div:last-child{min-width:0;overflow-wrap:anywhere;}
+#appRoot .card-title small{overflow-wrap:anywhere;}
+#appRoot .btn,#appRoot .action-btn,#appRoot .icon-btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+#appRoot input,#appRoot select,#appRoot textarea{font-size:16px;}
+#appRoot .dropzone{touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+#appRoot .repo-line{align-items:flex-start;}
+#appRoot .repo-line .branch{min-width:0;overflow-wrap:anywhere;word-break:break-word;}
+#appRoot .dependency-report{margin-top:10px;background:#0b0f14;border:1px solid var(--app-border-sub);border-radius:10px;padding:10px 12px;}
+#appRoot .dependency-report .dr-title{font:600 10px var(--app-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--app-text-3);margin-bottom:6px;}
+#appRoot .dependency-report .dr-row{font:10.5px var(--app-mono);color:var(--app-text-2);padding:2px 0;overflow-wrap:anywhere;}
+#appRoot .additional-actions{align-items:stretch;}
+@media (max-width:767px){
+  #appRoot{padding-bottom:calc(86px + env(safe-area-inset-bottom));}
+  #appRoot .topbar{padding:10px 12px;gap:8px;min-height:52px;}
+  #appRoot .brand{flex:1 1 auto;min-width:0;overflow:hidden;}
+  #appRoot .brand .name{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #appRoot .brand .sub{display:none;}
+  #appRoot .topbar-actions{flex:0 0 auto;display:flex;align-items:center;flex-wrap:nowrap;gap:5px;max-width:48%;}
+  #appRoot .topbar-actions .btn{white-space:nowrap;}
+  #appRoot .user-chip{max-width:122px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  #appRoot main{padding:10px 10px 20px;gap:10px;}
+  #appRoot .card{padding:13px;border-radius:12px;}
+  #appRoot .card-head{gap:8px;margin-bottom:10px;}
+  #appRoot .card-head>.row{width:auto;max-width:100%;}
+  #appRoot .zip-tools{flex:0 0 auto;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;max-width:52%;scrollbar-width:none;}
+  #appRoot .zip-tools::-webkit-scrollbar{display:none;}
+  #appRoot .zip-tools .btn{flex:0 0 auto;}
+  #appRoot .card-head>.btn{flex:0 0 auto;}
+  #appRoot .repo-line{font-size:12px;padding:10px;}
+  #appRoot .repo-line .branch{width:100%;margin:3px 0 0;}
+  #appRoot .dropzone{padding:24px 12px;min-height:126px;display:flex;flex-direction:column;justify-content:center;}
+  #appRoot .dropzone .dz-text{font-size:12.5px;line-height:1.45;}
+  #appRoot .dropzone .dz-sub{font-size:10px;}
+  #appRoot .row{gap:7px;}
+  #appRoot .row>.btn,#appRoot .row>a.btn{min-height:36px;}
+  #appRoot .additional-actions>.btn{flex:1 1 calc(50% - 7px);justify-content:center;text-align:center;line-height:1.25;}
+  #appRoot .artifact-row{display:flex;align-items:flex-start;gap:8px;}
+  #appRoot .artifact-row>div:first-child{flex:1 1 100%;min-width:0;}
+  #appRoot .artifact-row>.btn{flex:1 1 calc(50% - 8px);justify-content:center;}
+  #appRoot .build-status{gap:8px;align-items:flex-start;}
+  #appRoot .build-status .build-info{flex:1 1 140px;min-width:0;}
+  #appRoot .build-status>a.btn{flex:0 0 auto;}
+  #appRoot .live-progress .step{white-space:normal;overflow-wrap:anywhere;}
+  #appRoot .ai-actions{display:grid;grid-template-columns:1fr 1fr;}
+  #appRoot .ai-actions .btn{width:100%;justify-content:center;}
+  #appRoot textarea{min-height:100px;}
+  #appRoot .bottombar{padding:8px 10px calc(8px + env(safe-area-inset-bottom));}
+  #appRoot .action-btn{height:48px;border-radius:11px;font-size:13px;}
+  #appRoot .modal-overlay{align-items:flex-end;padding:0;}
+  #appRoot .modal{width:100%;max-width:none;max-height:min(92vh,760px);border-left:0;border-right:0;border-bottom:0;border-radius:18px 18px 0 0;padding:15px 14px calc(18px + env(safe-area-inset-bottom));}
+  #appRoot .modal-head{position:sticky;top:-15px;background:var(--app-card);z-index:2;padding:15px 0 10px;margin-bottom:10px;}
+  #appRoot .modal .row{flex-wrap:wrap;}
+  #appRoot .modal .row>.btn,#appRoot .modal .row>a.btn{flex:1 1 140px;justify-content:center;}
+  #appRoot .modal input,#appRoot .modal select,#appRoot .modal textarea{width:100%;max-width:100%;}
+  #appRoot .device-code{font-size:clamp(18px,6vw,24px);letter-spacing:2px;overflow-wrap:anywhere;}
+  #appRoot .file-tree{max-height:42vh;font-size:10.5px;}
+  #appRoot .console{max-height:260px;font-size:10.5px;}
+}
+@media (max-width:390px){
+  #appRoot .topbar{padding-inline:9px;}
+  #appRoot .topbar-actions{max-width:52%;}
+  #appRoot .topbar-actions .guide-top-btn{font-size:9.5px;padding:6px 7px;}
+  #appRoot .topbar-actions .btn.sm{font-size:9.5px;padding:6px 7px;}
+  #appRoot main{padding-inline:8px;}
+  #appRoot .card{padding:11px;}
+  #appRoot .card-title{font-size:13px;}
+  #appRoot .card-title small{font-size:9.5px;}
+  #appRoot .additional-actions>.btn{flex-basis:100%;}
+  #appRoot .ai-actions{grid-template-columns:1fr;}
+  #appRoot .modal{padding-inline:12px;}
+}
+@media (max-width:767px){
+  #landingRoot .wrap{padding-inline:16px;}
+  #landingRoot .nav{padding-block:13px;gap:8px;}
+  #landingRoot .logo{font-size:15px;min-width:0;}
+  #landingRoot .nav-actions{flex:0 0 auto;}
+  #landingRoot .nav-actions .btn{font-size:10px;padding:8px 9px;}
+  #landingRoot .hero{padding-top:54px;padding-bottom:42px;gap:30px;}
+  #landingRoot h1{font-size:clamp(31px,10.5vw,43px);line-height:1.04;}
+  #landingRoot .lede{font-size:14px;line-height:1.6;margin-bottom:24px;}
+  #landingRoot .hero-ctas{display:grid;grid-template-columns:1fr;gap:9px;}
+  #landingRoot .hero-ctas .btn{width:100%;justify-content:center;min-height:44px;}
+  #landingRoot .pipeline{padding:17px 13px;border-radius:13px;}
+  #landingRoot .stage-row{overflow-x:auto;justify-content:flex-start;gap:2px;padding:14px 0 22px;scrollbar-width:none;}
+  #landingRoot .stage-row::-webkit-scrollbar{display:none;}
+  #landingRoot .stage{min-width:78px;width:78px;}
+  #landingRoot .stage-icon{width:46px;height:46px;border-radius:12px;}
+  #landingRoot .stage-icon svg{width:21px;height:21px;}
+  #landingRoot .track{min-width:18px;margin-inline:2px;margin-bottom:27px;}
+  #landingRoot .terminal{font-size:10.5px;min-height:104px;padding:11px 12px;overflow:auto;}
+  #landingRoot section{padding:58px 0;}
+  #landingRoot .section-head{margin-bottom:30px;}
+  #landingRoot h2{font-size:25px;}
+  #landingRoot .steps,#landingRoot .grid-features{grid-template-columns:1fr;}
+  #landingRoot .manifest-grid{grid-template-columns:1fr;gap:18px;}
+}
+
+/* ===== ZIPTOAPK V6: MOBILE SCREEN FIDELITY PATCH ===== */
+#appRoot .app-logo-img{
+  width:34px;height:34px;border-radius:9px;object-fit:cover;flex:0 0 34px;
+  display:block;
+}
+#appRoot .brand{min-width:0}
+#appRoot .brand .name{color:#58A6FF}
+#appRoot .repo-card-title>div:last-child{min-width:0;display:flex;flex-direction:column}
+#appRoot .repo-card-title small{font-size:10.5px}
+#appRoot .edit-btn{color:#58A6FF;border-color:rgba(88,166,255,.38);font-weight:700}
+#appRoot .repo-action{min-width:0;flex:1 1 0;justify-content:center;white-space:nowrap}
+#appRoot .versions-action{color:#BC8CFF;border-color:rgba(188,140,255,.42)}
+#appRoot .ai-key-box{
+  display:flex;align-items:center;gap:9px;background:#0b0e13;border:1px solid rgba(188,140,255,.38);
+  border-radius:11px;padding:12px;color:#8b949e;font-size:12px;margin-bottom:14px;min-width:0;
+}
+#appRoot .ai-key-box>span:nth-child(2){flex:1;min-width:0}
+#appRoot .ai-setup-btn{background:#bc8cff;color:#fff;border-color:#bc8cff;font-weight:700;flex:0 0 auto}
+#appRoot .ai-task-label{margin-top:2px}
+#appRoot .ai-mode-row{
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:10px;
+  -webkit-overflow-scrolling:touch;
+}
+#appRoot .ai-mode-row::-webkit-scrollbar{display:none}
+#appRoot .ai-mode{
+  flex:0 0 auto;min-height:38px;padding:8px 12px;border:1px solid var(--app-border-sub);
+  border-radius:9px;background:#0b0e13;color:var(--app-text-2);font:600 11px var(--app-body);white-space:nowrap;
+}
+#appRoot .ai-mode.active{border-color:#bc8cff;background:rgba(188,140,255,.13);color:var(--app-text)}
+#appRoot .ai-quick-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-top:8px;padding-bottom:2px}
+#appRoot .ai-quick-row::-webkit-scrollbar{display:none}
+#appRoot .ai-quick-row .btn{flex:0 0 auto;white-space:nowrap}
+#appRoot .ai-run-full{width:100%;justify-content:center;background:#bc8cff;border-color:#bc8cff}
+#appRoot .ci-repo-chip{font-family:var(--app-mono);font-size:10px;color:var(--app-text-2);overflow-wrap:anywhere}
+@media(max-width:767px){
+  #appRoot .topbar{padding:10px 16px;min-height:62px}
+  #appRoot .brand .name{font-size:16px}
+  #appRoot .brand .sub{display:block;font-size:8.5px;letter-spacing:.12em}
+  #appRoot .topbar-actions{gap:6px;max-width:none}
+  #appRoot .topbar-actions .guide-top-btn{font-size:10.5px;padding:8px 10px}
+  #appRoot main{padding:14px 14px 22px;gap:12px}
+  #appRoot .card{padding:16px;border-radius:14px}
+  #appRoot .card-head{margin-bottom:12px}
+  #appRoot .card-title{font-size:15px}
+  #appRoot .card-title small{font-size:10.5px}
+  #appRoot .repo-line{font-size:13px;padding:11px}
+  #appRoot .repo-action{font-size:10.5px;padding:8px 7px}
+  #appRoot .dropzone{min-height:160px;padding:28px 14px}
+  #appRoot .dropzone .dz-text{font-size:13.5px}
+  #appRoot .dropzone .dz-sub{font-size:10.5px}
+  #appRoot .bottombar{padding:10px 28px calc(10px + env(safe-area-inset-bottom))}
+  #appRoot .action-btn{height:58px;border-radius:14px;font-size:15px}
+  #appRoot .modal{padding-left:18px;padding-right:18px}
+}
+@media(max-width:390px){
+  #appRoot .topbar{padding-inline:12px}
+  #appRoot .app-logo-img{width:32px;height:32px;flex-basis:32px}
+  #appRoot .brand .name{font-size:15px}
+  #appRoot .brand .sub{font-size:7.5px}
+  #appRoot .topbar-actions .guide-top-btn{font-size:9.5px;padding:7px 8px}
+  #appRoot .user-chip{font-size:10px;padding-right:7px}
+  #appRoot main{padding-inline:10px}
+  #appRoot .card{padding:13px}
+  #appRoot .repo-action{font-size:9.5px}
+  #appRoot .ai-key-box{font-size:11px}
+}
+@media(max-width:340px){
+  #appRoot .brand .sub{display:none}
+  #appRoot .topbar-actions .guide-top-btn{font-size:9px;padding:7px}
+}
+#landingRoot nav.links{display:flex}
+@media(max-width:860px){#landingRoot nav.links{display:none}}
+@media(max-width:600px){
+  #landingRoot .wrap{padding-inline:16px}
+  #landingRoot .nav{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+  #landingRoot .logo{min-width:0;white-space:nowrap}
+  #landingRoot .nav-actions{display:flex;gap:7px;min-width:0}
+  #landingRoot .nav-actions .btn{white-space:nowrap}
+  #landingRoot .hero{padding-top:50px}
+  #landingRoot .hero h1{font-size:clamp(35px,10.8vw,46px)}
+}
+
+
+/* Visible Privacy Card + clean responsive footer */
+#landingRoot .privacy-card{
+  display:flex;align-items:center;gap:16px;margin:34px 0 22px;padding:20px 22px;
+  background:linear-gradient(135deg,rgba(16,22,30,.98),rgba(11,17,24,.98));
+  border:1px solid rgba(0,230,160,.20);border-radius:16px;
+}
+#landingRoot .privacy-card-icon{
+  width:40px;height:40px;min-width:40px;display:grid;place-items:center;border-radius:12px;
+  color:var(--mint);border:1px solid rgba(0,230,160,.28);background:rgba(0,230,160,.08);font-weight:800;
+}
+#landingRoot .privacy-card-copy{min-width:0;flex:1}
+#landingRoot .privacy-card-title{color:var(--text);font-size:15px;font-weight:700;margin-bottom:3px}
+#landingRoot .privacy-card-text{color:var(--muted);font-size:12.5px;line-height:1.5}
+#landingRoot .privacy-card-link{flex-shrink:0;color:var(--mint);font-size:12.5px;font-weight:700;white-space:nowrap}
+#landingRoot .site-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;padding:24px 0 30px;margin-top:0;color:var(--muted);
+}
+#landingRoot .footer-brand{color:var(--text);font-weight:700;letter-spacing:-.2px}
+#landingRoot .footer-links{display:flex;align-items:center;gap:9px;font-size:12px}
+#landingRoot .footer-links a{color:var(--muted)}
+#landingRoot .footer-copy{color:var(--muted);font-size:11.5px;white-space:nowrap}
+@media(max-width:720px){
+  #landingRoot .privacy-card{align-items:flex-start;flex-wrap:wrap;gap:12px;padding:17px;margin:28px 0 16px}
+  #landingRoot .privacy-card-icon{width:36px;height:36px;min-width:36px;border-radius:10px}
+  #landingRoot .privacy-card-copy{flex:1;min-width:calc(100% - 54px)}
+  #landingRoot .privacy-card-link{width:100%;padding-top:11px;border-top:1px solid var(--line);text-align:left}
+  #landingRoot .site-footer{flex-wrap:wrap;justify-content:center;text-align:center;gap:8px 14px;padding:20px 0 28px}
+  #landingRoot .footer-brand{width:100%}
+  #landingRoot .footer-copy{width:100%;font-size:11px}
+}
+
+</style>
+<style>
+html,body{max-width:100%;overflow-x:hidden;}
+</style>
+</head>
+<body>
+
+<div id="landingRoot">
+
+<div class="noise"></div>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="bracket">[</span>ZipToApk<span class="apk">.apk</span><span class="bracket">]</span></div>
+    <nav class="links">
+      <a href="#inside">What's inside</a>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="privacy-policy/">Privacy</a>
+    </nav>
+    <div class="nav-actions"><a class="btn" href="javascript:void(0)" onclick="openAndroidApp()">Download Android App</a><button class="btn primary" onclick="showApp()">Try Now →</button></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" style="border:none; padding-top:96px;">
+    <div>
+      <div class="eyebrow">Android · On‑device build</div>
+      <h1>Turn any project zip<br>into a working <span class="accent">.apk</span></h1>
+      <p class="lede">Share a zip from AI Studio, Android Studio, or a hackathon repo straight into ZipToApk. It extracts the code, builds it, and hands you the built APK — no laptop, no terminal.</p>
+      <div class="hero-ctas">
+        <button class="btn primary" onclick="showApp()">Try Now →</button>
+        <button class="btn" onclick="openAndroidApp()">↓ Download Android App</button>
+        <a class="btn" href="#how">See how it builds</a>
+      </div>
+      <div class="file-hint">Just tap <code>Share → ZipToApk</code> on any .zip file</div>
+    </div>
+
+    <div class="pipeline" id="pipeline">
+      <div class="pipeline-top">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <div class="pipeline-label">build.log</div>
+      </div>
+
+      <div class="stage-row">
+        <div class="stage" id="stage-1">
+          <div class="stage-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f2a73b" stroke-width="1.6"><path d="M6 3v18M6 5h3M6 9h3M6 13h3M6 17h3M6 3h9a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6"/></svg>
+          </div>
+          <div class="stage-name">project.zip</div>
+        </div>
+        <div class="track"><div class="fill" id="fill-1"></div></div>
+        <div class="stage" id="stage-2">
+          <div class="stage-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f2a73b" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.36a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.64 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.64 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.64a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.36 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>
+          </div>
+          <div class="stage-name">building</div>
+        </div>
+        <div class="track"><div class="fill" id="fill-2"></div></div>
+        <div class="stage" id="stage-3">
+          <div class="stage-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#48e5a0" stroke-width="1.6"><path d="M6 18l3-11 2 4 2-4 3 11"/><path d="M4 18h16" /></svg>
+          </div>
+          <div class="stage-name">app.apk</div>
+        </div>
+      </div>
+
+      <div class="terminal" id="term"></div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE THE ZIP -->
+  <section id="inside">
+    <div class="section-head rv">
+      <div class="eyebrow">What's inside the zip</div>
+      <h2>Every permission, spelled out in plain language</h2>
+      <p>This is the actual manifest ZipToApk ships with — nothing hidden, nothing extra.</p>
+    </div>
+    <div class="manifest-grid rv">
+      <div class="code-card">
+        <div class="cc-head">AndroidManifest.xml</div>
+        <div><span class="tag">&lt;uses-permission</span> <span class="attr">android:name</span>=<span class="val">"INTERNET"</span> <span class="tag">/&gt;</span></div>
+        <div><span class="tag">&lt;uses-permission</span> <span class="attr">android:name</span>=<span class="val">"REQUEST_INSTALL_PACKAGES"</span> <span class="tag">/&gt;</span></div>
+        <div><span class="tag">&lt;uses-permission</span> <span class="attr">android:name</span>=<span class="val">"POST_NOTIFICATIONS"</span> <span class="tag">/&gt;</span></div>
+        <div><span class="tag">&lt;uses-permission</span> <span class="attr">android:name</span>=<span class="val">"ACCESS_NETWORK_STATE"</span> <span class="tag">/&gt;</span></div>
+        <div><span class="tag">&lt;provider</span> <span class="attr">android:name</span>=<span class="val">"FileProvider"</span> <span class="tag">/&gt;</span></div>
+      </div>
+      <div class="perm-list">
+        <div class="perm">
+          <div class="dot"></div>
+          <div><h4>Talk to GitHub</h4><p>Used only when you choose to push a build's source to a repo. <code>INTERNET</code></p></div>
+        </div>
+        <div class="perm">
+          <div class="dot"></div>
+          <div><h4>Install what it builds</h4><p>Lets the finished APK be installed without leaving the app. <code>REQUEST_INSTALL_PACKAGES</code></p></div>
+        </div>
+        <div class="perm">
+          <div class="dot"></div>
+          <div><h4>Tell you when it's done</h4><p>One notification, when your build finishes or needs attention. <code>POST_NOTIFICATIONS</code></p></div>
+        </div>
+        <div class="perm">
+          <div class="dot"></div>
+          <div><h4>Know if you're offline</h4><p>Pauses a GitHub push instead of failing silently. <code>ACCESS_NETWORK_STATE</code></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="section-head rv">
+      <div class="eyebrow">The pipeline</div>
+      <h2>Three steps, timestamped</h2>
+      <p>No SDK to install, no signing keys to manage — the same sequence runs whether the zip came from a share sheet or a downloaded file.</p>
+    </div>
+    <div class="steps rv">
+      <div class="step">
+        <div class="time">00:00 — Share</div>
+        <h3>Send the zip</h3>
+        <p>Send any .zip from a file manager, browser download, or AI Studio export directly to ZipToApk through the standard Android share sheet.</p>
+        <span class="out">→ application/zip received</span>
+      </div>
+      <div class="step">
+        <div class="time">00:04 — Build</div>
+        <h3>It extracts & builds</h3>
+        <p>ZipToApk unpacks the project, detects the build files, and compiles it — with a live log so you can see exactly what's happening.</p>
+        <span class="out">→ compiling…</span>
+      </div>
+      <div class="step">
+        <div class="time">00:38 — Ship</div>
+        <h3>Install or push it</h3>
+        <p>Get a notification when your built APK is ready to download — or push the clean source straight to a GitHub repo with CI/CD wired up.</p>
+        <span class="out">→ app-debug.apk ✓</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-head rv">
+      <div class="eyebrow">Under the hood</div>
+      <h2>Built for zips that were never meant to sit in a folder</h2>
+      <p>Every permission ZipToApk asks for maps to something you can see happen on screen.</p>
+    </div>
+    <div class="grid-features rv">
+      <div class="feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l6 6L20 6"/></svg>
+        <h3>Opens zips natively</h3>
+        <p>Registered to handle .zip files from any app — browser downloads, file managers, or a Share action.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+        <h3>Background extractor</h3>
+        <p>Watches for finished downloads and can pick up a zip the moment it lands, no need to reopen the app.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <h3>Live build log</h3>
+        <p>Every step — extract, detect, compile, sign — streams to an on-screen log so a stuck build is never a mystery.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+        <h3>Push to GitHub</h3>
+        <p>Once it builds clean, sign in once and push the extracted source to a repo with a CI/CD workflow already attached.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <h3>Secure OAuth</h3>
+        <p>GitHub sign-in happens through a proper OAuth deep link — ZipToApk never sees or stores your password.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 18h6"/></svg>
+        <h3>Install straight from the app</h3>
+        <p>Once the APK is signed, install it with one tap through Android's package installer — nothing leaves your device.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOURCES -->
+  <section id="sources" style="padding-bottom:60px;">
+    <div class="section-head rv" style="margin-bottom:0;">
+      <div class="eyebrow">Works with</div>
+      <h2>Bring a zip from wherever you built it</h2>
+      <div class="sources">
+        <span class="source-chip">AI Studio export <span class="ext">.zip</span></span>
+        <span class="source-chip">Android Studio project <span class="ext">.zip</span></span>
+        <span class="source-chip">GitHub codespace download <span class="ext">.zip</span></span>
+        <span class="source-chip">Hackathon starter repo <span class="ext">.zip</span></span>
+        <span class="source-chip">Replit / CodeSandbox export <span class="ext">.zip</span></span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<section class="cta-band" id="download">
+  <div class="wrap rv">
+    <div class="seal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 18l3-11 2 4 2-4 3 11"/><path d="M4 18h16"/></svg>
+    </div>
+    <h2>Your next APK is one share away</h2>
+    <p>Drop a zip in, walk away, come back to an installed app.</p>
+    <div class="cta-row">
+      <button class="btn primary" onclick="showApp()">Try Now →</button>
+      <button class="btn" onclick="openAndroidApp()">↓ Download Android App</button>
+      <a class="btn" href="#how">View the build steps</a>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="privacy-card" aria-label="Privacy Policy">
+  <div class="privacy-card-icon">✓</div>
+  <div class="privacy-card-copy">
+    <div class="privacy-card-title">Privacy Policy</div>
+    <div class="privacy-card-text">See how ZipToApk handles project files, GitHub access and optional AI features.</div>
+  </div>
+  <a class="privacy-card-link" href="privacy-policy/">Read Privacy Policy →</a>
+</section>
+
+<footer class="wrap site-footer">
+  <div class="footer-brand">ZipToApk</div>
+  <div class="footer-links">
+    <a href="privacy-policy/">Privacy Policy</a>
+    <span>·</span>
+    <a href="mailto:ziptoapk.support@gmail.com">Support</a>
+  </div>
+  <div class="footer-copy">Zip in, APK out.</div>
+</footer>
+
+</div>
+
+<div id="appRoot">
+
+
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <img class="app-logo-img" src="data:image/webp;base64,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" alt="ZipToApk">
+      <div><div class="name">ZipToApk 🇮🇳</div><span class="sub">AI STUDIO &amp; GEMINI COPILOT</span></div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn sm guide-top-btn" onclick="openModal('help')" title="Guide & FAQ">▤ Guide</button>
+      <div id="authArea"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- TARGET REPO CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title repo-card-title"><div class="ic" style="background:rgba(88,166,255,.12);color:var(--app-blue);">‹›</div><div><span>Target Repository</span><small id="repoTitleSub">Select a GitHub repository</small></div></div>
+      <button class="btn sm edit-btn" onclick="openModal('config')">✎ EDIT</button>
+    </div>
+    <div id="repoLineArea"></div>
+    <div class="row">
+      <button class="btn sm repo-action versions-action" onclick="openVersions()">◷ Versions (15)</button>
+      <button class="btn sm repo-action" onclick="openModal('singleFile')">📝 Batch Edit</button>
+      <button class="btn sm repo-action" onclick="openRepoPicker()">📁 Repos</button>
+    </div>
+  </div>
+
+  <!-- CI/CD CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="ic" style="background:rgba(88,166,255,.12);color:var(--app-blue);">🚀</div><div>GitHub CI/CD APK Tracker <span class="chip blue">ACTIONS</span><small id="ciRepoSub">Automated cloud APK build</small></div></div>
+      <button class="btn sm" id="ciRefreshBtn" onclick="checkCiCdStatus()">↻</button>
+    </div>
+    <div id="ciCdArea"></div>
+  </div>
+
+  <!-- ZIP DROPZONE CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="ic" style="background:rgba(63,185,80,.12);color:var(--app-success);">📦</div>Project ZIP</div>
+      <div id="zipInspectBtn" class="row zip-tools"></div>
+    </div>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="zipInput" accept=".zip" onchange="handleZipSelected(this.files[0])"/>
+      <div class="dz-ic">📁</div>
+      <div class="dz-text">Tap to select, or drop a project .zip here</div>
+      <div class="dz-sub">.zip · AI Studio export, Android Studio project, etc.</div>
+    </div>
+    <div class="zip-result" id="zipResultArea"></div><div id="dependencyReportArea"></div>
+  </div>
+
+  <!-- AI ASSISTANT CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="ic" style="background:rgba(240,136,62,.12);color:var(--app-warn);">✦</div>AI Code Assistant<small>Gemini-powered</small></div>
+      <button class="btn sm" onclick="openModal('gemini')" id="geminiCfgBtn">Configure Key</button>
+    </div>
+    <div id="aiArea">
+      <div class="ai-key-box"><span>ⓘ</span><span>Setup Free Gemini API Key to enable</span><button class="btn ai-setup-btn" onclick="openModal('gemini')" id="geminiSetupBtn">Setup Key</button></div>
+      <div class="field-label ai-task-label">TASK TYPE</div>
+      <div class="ai-mode-row" id="aiModeRow">
+        <button class="ai-mode active" data-mode="FIX_BUGS" onclick="selectAiMode('FIX_BUGS')">⚙ Fix Bugs &amp; Errors</button>
+        <button class="ai-mode" data-mode="ADD_FEATURE" onclick="selectAiMode('ADD_FEATURE')">✦ Add New Feature</button>
+        <button class="ai-mode" data-mode="OPTIMIZE_CODE" onclick="selectAiMode('OPTIMIZE_CODE')">◒ Refactor &amp; Optimize</button>
+        <button class="ai-mode" data-mode="EXPLAIN_CODE" onclick="selectAiMode('EXPLAIN_CODE')">☷ Explain Code</button>
+      </div>
+      <label class="field-label">Request</label>
+      <textarea id="aiPrompt" placeholder="e.g. Fix crash when clicking login button or paste build error log..."></textarea>
+      <div class="ai-quick-row">
+        <button class="btn sm" onclick="useAiQuick('Fix Android Crash')">+ Fix Android Crash</button>
+        <button class="btn sm" onclick="useAiQuick('Add Dark Mode')">+ Add Dark Mode</button>
+        <button class="btn sm" onclick="useAiQuick('Fix Build Errors')">+ Fix Build Errors</button>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary ai-run-full" onclick="runAiTask()" id="aiRunBtn">✦ <span id="aiRunLabel">Setup Free Key to Run</span></button>
+        <span class="hint" id="aiStatusText" style="align-self:center;"></span>
+      </div>
+      <div id="aiResultArea"></div>
+    </div>
+  </div>
+
+  <!-- ADDITIONAL FILES CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="ic" style="background:rgba(88,166,255,.12);color:var(--app-blue);">🗂</div>Additional Files<small>google-services.json / signing keystore</small></div>
+    </div>
+    <input type="file" id="jsonFileInput" accept=".json,application/json,text/plain" hidden onchange="handleAdditionalFile(this.files[0],'json')"/>
+    <input type="file" id="keystoreFileInput" accept=".b64,.base64,.keystore,*/*" hidden onchange="handleAdditionalFile(this.files[0],'keystore')"/>
+    <div class="row additional-actions">
+      <button class="btn sm" onclick="document.getElementById('jsonFileInput').click()">＋ Attach JSON File</button>
+      <button class="btn sm" onclick="openInputModal('json')">＋ Paste JSON</button>
+      <button class="btn sm" onclick="document.getElementById('keystoreFileInput').click()">＋ Attach Keystore/B64</button>
+      <button class="btn sm" onclick="openInputModal('keystore')">＋ Paste Base64 Key</button>
+    </div>
+    <div id="additionalFilesArea" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- CONSOLE CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="ic" style="background:rgba(139,148,158,.12);color:var(--app-text-2);">▤</div>Execution Console</div>
+      <div class="row">
+        <button class="btn sm" onclick="copyLogs()">Copy</button>
+        <button class="btn sm" onclick="clearLogs()">Clear</button>
+      </div>
+    </div>
+    <div class="console" id="consoleArea"><div class="console-empty">No activity yet — logs will stream here as you work.</div></div>
+  </div>
+
+  <!-- RECENT UPLOADS -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="ic" style="background:rgba(63,185,80,.12);color:var(--app-success);">↥</div>Recent Uploads</div>
+      <button class="btn sm" onclick="clearHistory()">Clear</button>
+    </div>
+    <div id="historyArea"><div class="empty-note">Nothing pushed yet this session.</div></div>
+  </div>
+
+</main>
+
+<div class="bottombar">
+  <button class="action-btn danger" id="mainActionBtn" onclick="onMainActionClick()">Connect with GitHub</button>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- CONFIG / AUTH MODAL -->
+<div class="modal-overlay" id="modal-config">
+  <div class="modal">
+    <div class="modal-head"><div><h3>GitHub Connection</h3><p>Personal access token stays in this browser tab only — never stored or sent anywhere but api.github.com.</p></div><button class="close" onclick="closeModal('config')">✕</button></div>
+    <div id="configBody"></div>
+  </div>
+</div>
+
+<!-- REPO PICKER MODAL -->
+<div class="modal-overlay" id="modal-repopicker">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Select a Repository</h3><p id="repoPickerSub">Your GitHub repositories</p></div><button class="close" onclick="closeModal('repopicker')">✕</button></div>
+    <input type="text" placeholder="Filter repos…" oninput="filterRepoPicker(this.value)" style="margin-bottom:10px;"/>
+    <div id="repoPickerList"></div><div class="divider"></div><div class="hint">Create a new repository</div><input id="newRepoName" placeholder="new-project" style="margin-top:7px"/><input id="newRepoDesc" placeholder="Description (optional)" style="margin-top:7px"/><label class="hint" style="display:block;margin-top:8px"><input id="newRepoPrivate" type="checkbox" checked> Private repository</label><button class="btn primary sm" style="margin-top:10px" onclick="createRepoFromWeb()">＋ Create & Select</button>
+  </div>
+</div>
+
+<!-- PUSH CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal-pushconfirm">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Confirm Push</h3><p>Review before writing to GitHub</p></div><button class="close" onclick="closeModal('pushconfirm')">✕</button></div>
+    <div id="pushConfirmBody"></div>
+  </div>
+</div>
+
+<!-- SECRETS WARNING MODAL -->
+<div class="modal-overlay" id="modal-secrets">
+  <div class="modal">
+    <div class="modal-head"><div><h3>⚠ Possible Secrets Detected</h3><p>These files contain patterns that look like credentials</p></div><button class="close" onclick="closeModal('secrets')">✕</button></div>
+    <div id="secretsBody"></div>
+  </div>
+</div>
+
+<!-- GEMINI CONFIG MODAL -->
+<div class="modal-overlay" id="modal-gemini">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Gemini API Key</h3><p>Used only for the AI Assistant card, kept in-memory</p></div><button class="close" onclick="closeModal('gemini')">✕</button></div>
+    <label class="field-label">API Key</label>
+    <input type="password" id="geminiKeyInput" placeholder="AIza…"/>
+    <label class="field-label" style="margin-top:10px;">Model</label>
+    <select id="geminiModelSelect">
+      <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+      <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+      <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+    </select>
+    <p class="hint" style="margin-top:10px;">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--app-blue)">aistudio.google.com/apikey</a></p>
+    <div class="row" style="margin-top:14px;justify-content:flex-end;">
+      <button class="btn ghost sm" onclick="clearGeminiKey()">Clear</button>
+      <button class="btn primary sm" onclick="saveGeminiConfig()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHANGE PREVIEW / APPLY MODAL -->
+<div class="modal-overlay" id="modal-aiPreview">
+  <div class="modal">
+    <div class="modal-head"><div><h3>AI Changes Ready</h3><p>Review Gemini's proposed file changes before they touch the project buffer.</p></div><button class="close" onclick="closeModal('aiPreview')">✕</button></div>
+    <div id="aiPreviewBody"></div>
+  </div>
+</div>
+
+<!-- SINGLE FILE MODAL -->
+<div class="modal-overlay" id="modal-singleFile">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Single File Commit</h3><p>Push one file directly to the repo, without a full ZIP</p></div><button class="close" onclick="closeModal('singleFile')">✕</button></div>
+    <div id="singleFileBody"></div>
+  </div>
+</div>
+
+<!-- VERSIONS MODAL -->
+<div class="modal-overlay" id="modal-versions">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Project Versions</h3><p>Recent commits on this branch</p></div><button class="close" onclick="closeModal('versions')">✕</button></div>
+    <div id="versionsBody"></div>
+  </div>
+</div>
+
+<!-- INSPECT MODAL -->
+<div class="modal-overlay" id="modal-inspect">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Inspect Extracted Files</h3><p id="inspectSub"></p></div><button class="close" onclick="closeModal('inspect')">✕</button></div>
+    <div id="inspectBody"></div>
+  </div>
+</div>
+
+<!-- INPUT / QR MODALS -->
+<div class="modal-overlay" id="modal-input"><div class="modal"><div class="modal-head"><div><h3 id="inputTitle">Paste input</h3><p id="inputSub"></p></div><button class="close" onclick="closeModal('input')">✕</button></div><textarea id="inputValue" style="min-height:220px;width:100%;font-family:var(--app-mono);font-size:11px"></textarea><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn sm" onclick="closeModal('input')">Cancel</button><button class="btn primary sm" onclick="confirmGenericInput()" id="inputConfirmBtn">Apply</button></div></div></div>
+<div class="modal-overlay" id="modal-qr"><div class="modal"><div class="modal-head"><div><h3>APK QR Code</h3><p id="qrSub">Scan to open the artifact download.</p></div><button class="close" onclick="closeModal('qr')">✕</button></div><div id="qrCanvas" style="display:flex;justify-content:center;padding:20px;background:white;border-radius:10px"></div><div class="row" style="margin-top:12px;justify-content:center"><a id="qrDownloadLink" class="btn primary sm" target="_blank">Open APK Download ↗</a></div></div></div>
+<!-- BUILD FAILURE MODAL -->
+<div class="modal-overlay" id="modal-buildFailure"><div class="modal">
+  <div class="modal-head"><div><h3>Build Failed</h3><p>Review the GitHub Actions failure before retrying or asking AI.</p></div><button class="close" onclick="closeModal('buildFailure')">✕</button></div>
+  <div id="buildFailureBody"></div>
+</div></div>
+
+<!-- UI PREVIEW MODAL -->
+<div class="modal-overlay" id="modal-uiPreview"><div class="modal">
+  <div class="modal-head"><div><h3>Project / UI Preview</h3><p>Preview relevant source files before applying AI changes.</p></div><button class="close" onclick="closeModal('uiPreview')">✕</button></div>
+  <div id="uiPreviewBody"></div>
+</div></div>
+
+<!-- SNAPSHOT CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal-confirm"><div class="modal">
+  <div class="modal-head"><div><h3 id="confirmTitle">Confirm</h3><p id="confirmSub">Please review this action.</p></div><button class="close" onclick="closeModal('confirm')">✕</button></div>
+  <div id="confirmBody"></div>
+</div></div>
+
+<!-- ABOUT MODAL -->
+<div class="modal-overlay" id="modal-about"><div class="modal">
+  <div class="modal-head"><div><h3>About ZipToApk</h3><p>ZIP project → GitHub → Android build pipeline.</p></div><button class="close" onclick="closeModal('about')">✕</button></div>
+  <div class="hint" style="line-height:1.8">This web companion follows the Android project's documented workflow: inspect the ZIP, detect dependencies, scan for secrets, confirm the GitHub operation, push source through Git data APIs, track GitHub Actions, then expose the APK artifact when the build succeeds. GitHub authentication and API access are brokered by the secure Cloudflare Worker session.</div>
+</div></div>
+
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="modal-help">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Guide · How ZipToApk works</h3><p>Use this as the web equivalent of the Android app's Tutorial & Help.</p></div><button class="close" onclick="closeModal('help')">✕</button></div>
+    <div class="guide-list">
+      <details open><summary>1 · Connect GitHub</summary><p>Use the secure GitHub connection button. Authorization is handled by web-auth.ziptoapk.in; the browser receives only the authenticated web session, not the GitHub OAuth token.</p></details>
+      <details><summary>2 · Repository management</summary><p>Select an existing repository, branch, or create a new repository. The push confirmation shows owner, repository, branch, commit message, file count, total size and attached-file status before anything is written.</p></details>
+      <details><summary>3 · ZIP extraction & inspection</summary><p>The ZIP is unpacked in-browser. Unsafe paths are rejected. Build/cache folders and generated artifacts are filtered so they are not unnecessarily pushed. Use Inspect to review the resulting file tree.</p></details>
+      <details><summary>4 · Dependencies & additional files</summary><p>Projects may need files such as <code>google-services.json</code> or a debug keystore. The Android app has dedicated detection and attachment flows; the web interface exposes the same concept before push.</p></details>
+      <details><summary>5 · Secrets scanner</summary><p>Credential-like patterns are checked before push. If findings exist, the safe path is to exclude the flagged files. You can explicitly cancel or bypass the warning, but bypassing should be treated as a deliberate risk.</p></details>
+      <details><summary>6 · Full ZIP vs single-file update</summary><p>Full ZIP push sends the project tree. Single File is for surgical hotfixes such as updating one source/config file without replacing the whole project.</p></details>
+      <details><summary>7 · AI bug fixing</summary><p>Gemini can analyze the project and propose complete file changes. Review the analysis and changed-file list, preview the relevant source, then explicitly apply changes. AI changes modify the current project buffer first; they are not automatically pushed.</p></details>
+      <details><summary>8 · Build & percentage</summary><p>After the GitHub commit/ref update, GitHub Actions performs the Android build. The tracker polls the workflow and calculates progress from completed workflow steps, showing the current step and percentage.</p></details>
+      <details><summary>9 · Build failure</summary><p>A failed workflow should expose the failure state and logs. Use <b>Fix with AI</b> to copy the failure context into the AI assistant, review the proposed changes, then rebuild only after confirmation.</p></details>
+      <details><summary>10 · APK result</summary><p>The Download APK action appears only after a successful workflow has produced an artifact. The artifact ZIP is opened, an APK is located, and the APK file is downloaded. A browser cannot silently install it like the Android app's package-installer flow.</p></details>
+      <details><summary>11 · Versions / snapshots</summary><p>Project versions are represented by Git commits. Download, restore and delete operations should use their own confirmation dialogs rather than executing destructive actions immediately.</p></details>
+      <details><summary>12 · Remote announcements / FAQ</summary><p>The Android app supports remote configuration for announcements, FAQs, tutorial videos and update information. The web companion exposes a refreshable control area for the same operational concept.</p></details>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+  // ---------- scroll reveal ----------
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  // ---------- animated build pipeline sequence ----------
+  const fills = [document.getElementById('fill-1'), document.getElementById('fill-2')];
+  const stages = [document.getElementById('stage-1'), document.getElementById('stage-2'), document.getElementById('stage-3')];
+  const term = document.getElementById('term');
+
+  const logLines = [
+    { text: '$ unzip project.zip', cls: '' },
+    { text: '→ detected: Android Gradle project', cls: '' },
+    { text: '→ compiling sources…', cls: '' },
+    { text: '→ assembling app-debug.apk', cls: '' },
+    { text: '✓ build finished', cls: 'ok' },
+  ];
+
+  function typeLog(){
+    term.innerHTML = '';
+    let i = 0;
+    function next(){
+      if (i >= logLines.length){
+        const cur = document.createElement('span');
+        cur.className = 'cursor';
+        term.appendChild(cur);
+        return;
+      }
+      const div = document.createElement('div');
+      div.className = 'line ' + logLines[i].cls;
+      div.textContent = logLines[i].text;
+      term.appendChild(div);
+      i++;
+      setTimeout(next, 480);
+    }
+    next();
+  }
+
+  function runPipeline(){
+    stages.forEach(s => s.classList.remove('active','done'));
+    fills.forEach(f => f.style.width = '0%');
+
+    stages[0].classList.add('active');
+    setTimeout(() => {
+      stages[0].classList.remove('active'); stages[0].classList.add('done');
+      fills[0].style.width = '100%';
+      stages[1].classList.add('active');
+    }, 500);
+
+    setTimeout(() => {
+      stages[1].classList.remove('active'); stages[1].classList.add('done');
+      fills[1].style.width = '100%';
+      stages[2].classList.add('active');
+    }, 1700);
+
+    setTimeout(() => {
+      stages[2].classList.remove('active'); stages[2].classList.add('done');
+    }, 2600);
+  }
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce){
+    stages.forEach(s => s.classList.add('done'));
+    fills.forEach(f => f.style.width = '100%');
+    term.innerHTML = logLines.map(l => `<div class="line ${l.cls}" style="opacity:1">${l.text}</div>`).join('');
+    document.querySelectorAll('.rv').forEach(function(el){ el.classList.add('in'); });
+  } else {
+    runPipeline();
+    typeLog();
+    setInterval(() => { runPipeline(); typeLog(); }, 6500);
+  }
+
+</script>
+
+<script>
+
+/* ============================= STATE ============================= */
+const state = {
+  user:null, isAuthenticated:false,
+  owner:'', repo:'', branch:'main', commitMessage:'Update from ZipToApk Web',
+  userRepos:[], branches:[],
+  selectedZipName:null, selectedZipSize:0,
+  extractedFiles:[], // {path,bytes:Uint8Array,size,isBinary}
+  isExtracting:false, isPushing:false, pushStage:'',
+  ciCdStatus:null, isCheckingCiCd:false,
+  consoleLogs:[], history:[],
+  geminiKey:null, geminiModel:'gemini-2.0-flash', isAiRunning:false,
+  attachedJson:null, attachedKeystore:null,
+  pendingBatch:null,
+  aiPendingChanges:[],
+  aiPendingResult:null,
+  oauthDeviceCode:null,
+  oauthUserCode:null,
+  oauthInterval:5 // for single file dialog batching
+};
+
+const GH = 'https://api.github.com';
+
+/* ============================= UTIL ============================= */
+function fmtBytes(b){
+  if(b<1024) return b+' B';
+  if(b<1024*1024) return (b/1024).toFixed(1)+' KB';
+  return (b/1024/1024).toFixed(2)+' MB';
+}
+function timeAgo(iso){
+  const s = Math.floor((Date.now()-new Date(iso).getTime())/1000);
+  if(s<60) return s+'s ago';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+function log(msg, cls){
+  cls = cls || '';
+  const ts = new Date().toLocaleTimeString('en-US',{hour12:false});
+  state.consoleLogs.push({ts,msg,cls});
+  if(state.consoleLogs.length>300) state.consoleLogs.shift();
+  renderConsole();
+}
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  wrap.appendChild(t);
+  setTimeout(()=>t.remove(),3200);
+}
+function openModal(name){ document.getElementById('modal-'+name).classList.add('open'); }
+function closeModal(name){ document.getElementById('modal-'+name).classList.remove('open'); }
+function b64FromUint8(bytes){
+  let binary=''; const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){ binary+=String.fromCharCode.apply(null, bytes.subarray(i,i+chunk)); }
+  return btoa(binary);
+}
+function utf8ToB64(str){ return btoa(unescape(encodeURIComponent(str))); }
+
+/* ============================= SECURE WEB BACKEND =============================
+   GitHub OAuth and GitHub API access are brokered by the Cloudflare Worker.
+   No GitHub client secret, PAT, OAuth access token, or refresh token is embedded
+   in this page. The browser authenticates with an HttpOnly/Secure session cookie.
+   Required Worker contract:
+     GET  /oauth/start?return_to=https%3A%2F%2Fziptoapk.in%2F
+     GET  /oauth/session          -> {authenticated,user}
+     POST /oauth/logout           -> clears the HttpOnly session cookie
+     /api/github/*                -> allow-listed proxy to https://api.github.com/*
+   The Worker must generate/store OAuth state + PKCE verifier server-side, exchange
+   the code server-side, and never put the GitHub token into the browser response.
+   ============================================================================== */
+const WEB_WORKER_ORIGIN = 'https://web-auth.ziptoapk.in';
+const WEB_RETURN_URL = 'https://ziptoapk.in/';
+const WEB_OAUTH_MARKER = 'oauth';
+
+async function gh(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({'Accept':'application/vnd.github+json'}, opts.headers||{});
+  delete headers.Authorization;
+  const res = await fetch(WEB_WORKER_ORIGIN+'/api/github'+path, Object.assign({}, opts, {
+    headers,
+    credentials:'include'
+  }));
+  if(!res.ok){
+    let body='';
+    try{ body=(await res.json()).message||''; }catch(e){}
+    if(res.status===401 || res.status===403){
+      throw new Error('GitHub session is not authorized. Please reconnect GitHub.');
+    }
+    throw new Error('GitHub API '+res.status+': '+(body||res.statusText));
+  }
+  if(res.status===204) return null;
+  const ct=res.headers.get('content-type')||'';
+  if(ct.includes('application/json')) return res.json();
+  return res.blob();
+}
+
+async function startGitHubWebOAuth(){
+  const btn=document.getElementById('oauthStartBtn');
+  if(btn){btn.disabled=true;btn.textContent='Opening secure GitHub sign-in…';}
+  try{
+    const returnTo=encodeURIComponent(WEB_RETURN_URL);
+    window.location.assign(WEB_WORKER_ORIGIN+'/oauth/start?return_to='+returnTo);
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Connect GitHub securely →';}
+    log('GitHub OAuth start failed: '+e.message,'err');
+    toast('Could not start GitHub sign-in');
+  }
+}
+
+async function restoreWebSession(){
+  try{
+    const res=await fetch(WEB_WORKER_ORIGIN+'/oauth/session',{credentials:'include',headers:{'Accept':'application/json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const d=await res.json();
+    if(d && d.authenticated && d.user){
+      state.user=d.user; state.isAuthenticated=true; state.owner=state.owner||d.user.login;
+      log('Secure GitHub session restored as '+d.user.login,'ok');
+      renderAuthArea(); renderConfigModal(); renderMainButton(); renderRepoLine();
+      fetchUserRepos();
+    }
+  }catch(e){
+    // A missing session is normal on first visit. Do not expose backend details to users.
+    log('No active GitHub session','info');
+    renderAuthArea(); renderConfigModal(); renderMainButton(); renderRepoLine();
+  }
+}
+
+function handleOAuthReturn(){
+  const p=new URLSearchParams(window.location.search);
+  const marker=p.get(WEB_OAUTH_MARKER);
+  if(marker==='success'){
+    history.replaceState({},document.title,window.location.pathname+window.location.hash);
+    toast('GitHub connected — verifying session…');
+    restoreWebSession();
+  }else if(marker==='error'){
+    const reason=p.get('reason');
+    history.replaceState({},document.title,window.location.pathname+window.location.hash);
+    log('GitHub OAuth was not completed','warn');
+    toast(reason==='denied'?'GitHub authorization was cancelled':'GitHub connection failed');
+  }
+}
+
+/* ============================= RENDER: AUTH AREA ============================= */
+function renderAuthArea(){
+  const el = document.getElementById('authArea');
+  if(state.isAuthenticated && state.user){
+    el.innerHTML = `<div class="user-chip" onclick="openModal('config')"><img src="${state.user.avatar_url}"/> ${state.user.login}</div>`;
+  } else {
+    el.innerHTML = `<button class="btn sm primary" onclick="openModal('config')">Connect</button>`;
+  }
+}
+
+/* ============================= RENDER: REPO LINE ============================= */
+function renderRepoLine(){
+  const el = document.getElementById('repoLineArea');
+  if(state.owner && state.repo){
+    el.innerHTML = `<div class="repo-line"><span class="owner">${state.owner}</span><span class="slash">/</span><span class="repo">${state.repo}</span><span class="branch">⑂ ${state.branch}</span></div>`;
+  } else {
+    el.innerHTML = `<div class="repo-empty">No repository selected yet</div>`;
+  }
+}
+
+/* ============================= AUTH FLOW ============================= */
+function renderConfigModal(){
+  const body = document.getElementById('configBody');
+  if(state.isAuthenticated && state.user){
+    body.innerHTML = `
+      <div class="row" style="align-items:center;gap:12px;margin-bottom:14px;">
+        <img src="${state.user.avatar_url}" style="width:46px;height:46px;border-radius:50%;">
+        <div><div style="font-weight:600;">${state.user.name||state.user.login}</div><div class="hint mono">@${state.user.login}</div></div>
+      </div>
+      <div class="divider"></div>
+      <label class="field-label">Owner</label>
+      <input type="text" id="cfgOwner" value="${state.owner||state.user.login}"/>
+      <label class="field-label" style="margin-top:10px;">Repository</label>
+      <input type="text" id="cfgRepo" value="${state.repo}" placeholder="my-project"/>
+      <label class="field-label" style="margin-top:10px;">Branch</label>
+      <input type="text" id="cfgBranch" value="${state.branch}" placeholder="main"/>
+      <label class="field-label" style="margin-top:10px;">Commit message</label>
+      <input type="text" id="cfgMsg" value="${state.commitMessage}"/>
+      <div class="row" style="margin-top:16px;">
+        <button class="btn primary sm" onclick="saveConfigFields()">Save</button>
+        <button class="btn sm" onclick="closeModal('config');openRepoPicker();">Browse repos</button>
+        <button class="btn sm" style="margin-left:auto;color:var(--app-danger);" onclick="logout()">Log out</button>
+      </div>`;
+  } else {
+    body.innerHTML = `
+      <div class="oauth-box">
+        <div class="oauth-title">Secure GitHub connection</div>
+        <div class="hint">Connect through ZipToApk's secure OAuth service. Your GitHub password and OAuth client secret are never entered or stored in this page.</div>
+        <button class="btn primary" style="margin-top:12px;width:100%;justify-content:center;" onclick="startGitHubWebOAuth()" id="oauthStartBtn">Connect GitHub securely →</button>
+        <div class="oauth-status">You will be redirected to <code>web-auth.ziptoapk.in</code>, then returned here after GitHub authorization.</div>
+      </div>`;
+  }
+}
+
+function saveConfigFields(){
+  state.owner = document.getElementById('cfgOwner').value.trim();
+  state.repo = document.getElementById('cfgRepo').value.trim();
+  state.branch = document.getElementById('cfgBranch').value.trim()||'main';
+  state.commitMessage = document.getElementById('cfgMsg').value.trim()||'Update from ZipToApk Web';
+  renderRepoLine(); renderMainButton();
+  closeModal('config');
+  toast('Repo config saved');
+  if(state.owner && state.repo) checkCiCdStatus();
+}
+
+async function logout(){
+  try{
+    await fetch(WEB_WORKER_ORIGIN+'/oauth/logout',{method:'POST',credentials:'include',headers:{'Accept':'application/json'}});
+  }catch(e){ log('Session logout request failed','warn'); }
+  state.user=null; state.isAuthenticated=false;
+  state.userRepos=[]; state.ciCdStatus=null;
+  renderAuthArea(); renderRepoLine(); renderMainButton(); renderCiCd();
+  closeModal('config');
+  log('Logged out','warn');
+  toast('GitHub disconnected');
+}
+
+/* ============================= REPO PICKER ============================= */
+async function fetchUserRepos(){
+  if(!state.isAuthenticated) return;
+  try{
+    const repos = await gh('/user/repos?per_page=100&sort=updated');
+    state.userRepos = repos;
+    log('Fetched '+repos.length+' repositories','info');
+  }catch(e){ log('Repo fetch failed: '+e.message,'err'); }
+}
+function openRepoPicker(){
+  if(!state.isAuthenticated){ openModal('config'); toast('Connect GitHub first'); return; }
+  openModal('repopicker');
+  renderRepoPickerList(state.userRepos);
+  if(state.userRepos.length===0) fetchUserRepos().then(()=>renderRepoPickerList(state.userRepos));
+}
+function renderRepoPickerList(list){
+  const el = document.getElementById('repoPickerList');
+  if(!list.length){ el.innerHTML = '<div class="empty-note">Loading repositories…</div>'; return; }
+  el.innerHTML = list.map(r=>`
+    <div class="repo-pick-item" onclick="selectRepoFromPicker('${r.owner.login}','${r.name}','${r.default_branch}')">
+      <div><div class="rname">${r.full_name}</div><div class="rvis">${r.private?'private':'public'} · ⑂ ${r.default_branch}</div></div>
+      <span style="color:var(--app-text-3)">›</span>
+    </div>`).join('');
+}
+function filterRepoPicker(q){
+  q=q.toLowerCase();
+  renderRepoPickerList(state.userRepos.filter(r=>r.full_name.toLowerCase().includes(q)));
+}
+function selectRepoFromPicker(owner,repo,branch){
+  state.owner=owner; state.repo=repo; state.branch=branch;
+  renderRepoLine(); renderMainButton();
+  closeModal('repopicker');
+  toast('Selected '+owner+'/'+repo);
+  log('Target set to '+owner+'/'+repo+' @ '+branch,'info');
+  checkCiCdStatus();
+}
+
+/* ============================= ZIP HANDLING ============================= */
+const dz = document.getElementById('dropzone');
+['dragover','dragleave','drop'].forEach(evt=>{
+  dz.addEventListener(evt, e=>{
+    e.preventDefault();
+    if(evt==='dragover') dz.classList.add('drag');
+    else dz.classList.remove('drag');
+    if(evt==='drop' && e.dataTransfer.files[0]) handleZipSelected(e.dataTransfer.files[0]);
+  });
+});
+
+async function handleZipSelected(file){
+  if(!file) return;
+  if(!/\.zip$/i.test(file.name)){toast('Only .zip projects are supported');return}
+  const MAX_ZIP_BYTES=250*1024*1024;
+  if(file.size>MAX_ZIP_BYTES){toast('ZIP is larger than the 250 MB browser limit');return}
+  state.selectedZipName=file.name; state.selectedZipSize=file.size; state.isExtracting=true; renderZipResult(); renderMainButton();
+  log('Reading '+file.name+' ('+fmtBytes(file.size)+')','info');
+  try{
+    const zip=await JSZip.loadAsync(file); const files=[]; const entries=Object.values(zip.files).filter(f=>!f.dir);
+    const ignoredDirs=['build','.gradle','.idea','.git','.cxx','node_modules','.cache','captures','.externalNativeBuild','__MACOSX'];
+    const ignoredExt=['.apk','.aab','.dex','.class','.tmp','.log','.aar','.hprof','.orig']; const ignoredNames=['.ds_store','thumbs.db','desktop.ini'];
+    let skipped=0;
+    for(const entry of entries){
+      let path=entry.name.replaceAll('\\\\','/').trim().replace(/^\/+/, '');
+      if(path.split('/').some(x=>x==='..')||path.startsWith('../')){skipped++;log('Skipped unsafe ZIP path: '+entry.name,'warn');continue}
+      const lower=path.toLowerCase(); const parts=lower.split('/'); const base=parts[parts.length-1];
+      if(ignoredDirs.some(d=>parts.includes(d))||ignoredNames.includes(base)||ignoredExt.some(e=>base.endsWith(e))){skipped++;continue}
+      const bytes=await entry.async('uint8array'); files.push({path,bytes,size:bytes.length,isBinary:looksBinary(bytes)});
+      if(files.length%25===0) log('Scanning archive… '+files.length+' files accepted','info');
+    }
+    if(!files.length) throw new Error('ZIP contains no usable source files');
+    const roots=files.map(f=>f.path.split('/')); let common='';
+    if(roots.length){const first=roots[0][0]; if(first&&roots.every(a=>a[0]===first&&a.length>1)) common=first+'/';}
+    if(common){files.forEach(f=>{f.path=f.path.startsWith(common)?f.path.slice(common.length):f.path});}
+    files.sort((a,b)=>a.path.localeCompare(b.path)); state.extractedFiles=files; state.isExtracting=false;
+    log(`Extracted ${files.length} usable files; skipped ${skipped} build/cache/unsafe entries`,'ok'); renderZipResult(); renderMainButton(); scanForSecretsPreview();
+  }catch(e){state.isExtracting=false;log('Extraction failed: '+e.message,'err');toast('Could not read zip: '+e.message);renderZipResult();renderMainButton();}
+}
+
+function looksBinary(bytes){
+  const n = Math.min(bytes.length, 512);
+  for(let i=0;i<n;i++){ if(bytes[i]===0) return true; }
+  return false;
+}
+function renderZipResult(){
+  const el = document.getElementById('zipResultArea');
+  const btnHolder = document.getElementById('zipInspectBtn');
+  if(!state.selectedZipName){ el.innerHTML=''; btnHolder.innerHTML=''; return; }
+  btnHolder.innerHTML = state.extractedFiles.length ? `<button class="btn sm" onclick="openInspect()">Inspect (${state.extractedFiles.length})</button><button class="btn sm" onclick="openUiPreview()">UI Preview</button>` : '';
+  if(state.isExtracting){
+    el.innerHTML = `<div class="zip-file-row"><div class="spinner" style="border-top-color:var(--app-blue);"></div><div><div class="fname">${state.selectedZipName}</div><div class="fmeta">Extracting…</div></div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="zip-file-row"><div class="fic">✅</div><div><div class="fname">${state.selectedZipName}</div><div class="fmeta">${fmtBytes(state.selectedZipSize)} · ${state.extractedFiles.length} files extracted</div></div></div>`;
+}
+function openInspect(){
+  document.getElementById('inspectSub').textContent = state.extractedFiles.length+' files, '+fmtBytes(state.extractedFiles.reduce((a,f)=>a+f.size,0))+' total';
+  const el = document.getElementById('inspectBody');
+  el.innerHTML = `<div class="file-tree">${state.extractedFiles.slice(0,500).map(f=>`<div class="frow"><span class="fpath">${f.path}</span><span class="fsize">${fmtBytes(f.size)}</span></div>`).join('')}</div>`;
+  openModal('inspect');
+}
+function scanForSecretsPreview(){
+  const found = scanSecrets(state.extractedFiles);
+  if(found.length) log(found.length+' file(s) flagged by secrets scanner — reviewed at push time','warn');
+}
+function renderDependencyReport(){
+  const el=document.getElementById('dependencyReportArea'); if(!el) return;
+  const paths=state.extractedFiles.map(f=>f.path.replaceAll('\\','/'));
+  const found=[];
+  const add=(name,items)=>{if(items.length)found.push(name+' · '+items.slice(0,3).join(', ')+(items.length>3?' …':''));};
+  add('Gradle',paths.filter(p=>/build\.gradle(?:\.kts)?$|settings\.gradle(?:\.kts)?$/i.test(p)));
+  add('Android Manifest',paths.filter(p=>/AndroidManifest\.xml$/i.test(p)));
+  add('Gradle Wrapper',paths.filter(p=>/gradle\/wrapper\/gradle-wrapper\.properties$/i.test(p)));
+  add('GitHub Actions',paths.filter(p=>/\.github\/workflows\/.+\.ya?ml$/i.test(p)));
+  add('Firebase config',paths.filter(p=>/google-services\.json$/i.test(p)));
+  el.innerHTML=found.length?`<div class="dependency-report"><div class="dr-title">Project analysis</div>${found.map(x=>`<div class="dr-row">✓ ${escapeHtml(x)}</div>`).join('')}</div>`:'';
+}
+async function handleAdditionalFile(file,type){
+  if(!file)return;
+  try{
+    const bytes=new Uint8Array(await file.arrayBuffer());
+    if(type==='json'){
+      const text=new TextDecoder().decode(bytes); JSON.parse(text);
+      state.attachedJson={name:file.name,size:bytes.length,bytes};
+      log('Attached '+file.name+' ('+fmtBytes(bytes.length)+')','ok');
+    }else{
+      state.attachedKeystore={name:file.name,size:bytes.length,bytes};
+      log('Attached keystore/base64 '+file.name+' ('+fmtBytes(bytes.length)+')','ok');
+    }
+    renderAdditionalFiles(); toast('File attached');
+  }catch(e){toast(type==='json'?'Invalid JSON file':'Could not read keystore file');log('Additional file failed: '+e.message,'err')}
+}
+
+const SECRET_PATTERNS = [
+  {name:'Google / Firebase API Key', re:/\bAIza[0-9A-Za-z\-_]{35}\b/g},
+  {name:'GitHub Personal Access Token', re:/\b(?:ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|gho_[A-Za-z0-9]{36}|ghu_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36})\b/g},
+  {name:'AWS Access Key ID', re:/\bAKIA[0-9A-Z]{16}\b/g},
+  {name:'AI Provider API Key (OpenAI/Anthropic)', re:/\b(?:sk-[A-Za-z0-9]{20,}|sk-ant-[A-Za-z0-9_-]{20,})\b/g},
+  {name:'Slack API Token', re:/\bxox[baprs]-[0-9A-Za-z]{10,48}\b/g},
+  {name:'Private Key Certificate', re:/-----BEGIN (?:[A-Z0-9_-]+ )?PRIVATE KEY-----/g},
+  {name:'Hardcoded Code Secret / Credential', re:/(?:password|client_secret|auth_token|secret_key|api_secret)\s*[:=]\s*["']([^"'\s]{12,})["']/gi}
+];
+const SECRET_PLACEHOLDERS=['placeholder','your_key','your_secret','your_token','dummy','sample','example','changeme','test','demo','xxx','123456','secret','password','my_token','key_auth_token','key_user_login','key_client_secret','auth_token','access_token','refresh_token','github_pat_token','github_token','oauth_token','auth_token_key','key_access_token','key_refresh_token'];
+const IGNORED_WEB_DIRS=['build','.gradle','.idea','.git','.cxx','node_modules','.cache','captures','.externalNativeBuild','__MACOSX'];
+const IGNORED_WEB_EXT=['.apk','.aab','.dex','.class','.tmp','.log','.aar','.hprof','.orig'];
+function isPlaceholderSecret(v){const x=String(v).toLowerCase();return SECRET_PLACEHOLDERS.some(p=>x.includes(p))||/^\d+$/.test(v)||/^[a-zA-Z]$/.test(v)}
+function looksLikePatternDefinition(line){return /Regex\(|Pattern\.compile|PRIVATE_KEY|findAll\(|containsMatchIn|CODE_SECRET_ASSIGN_REGEX|GOOGLE_KEY_REGEX|GITHUB_PAT_REGEX/.test(line)}
+function looksLikeKeyConstant(line,value){return /(key_|token|secret|password|auth_token|access_token|refresh_token)/i.test(line) && /(BuildConfig|SharedPreferences|preferences|constant|const\s+val)/i.test(line) && isPlaceholderSecret(value)}
+function maskSecret(v){v=String(v); if(v.length<=8)return '********'; return v.slice(0,4)+'...****...'+v.slice(-4)}
+function scanSecrets(files){
+  const flagged=[];
+  let textFilesCount=0;
+  for(const f of files){
+    if(f.isBinary) continue;
+    const path=f.path.replaceAll('\\\\','/'); const lower=path.toLowerCase(); const parts=lower.split('/'); const base=parts[parts.length-1];
+    if(IGNORED_WEB_DIRS.some(d=>parts.includes(d))||IGNORED_WEB_EXT.some(e=>lower.endsWith(e))||base.startsWith('google-services')||base.startsWith('debug.keystore')||lower.endsWith('.example')||lower.endsWith('.sample')||lower.includes('/test/')||lower.includes('/androidtest/')||lower.includes('/testdebugunittest/')||lower.endsWith('.md')||lower.endsWith('.txt')) continue;
+    let text; try{text=new TextDecoder('utf-8').decode(f.bytes)}catch(e){continue}
+    textFilesCount++;
+    const lines=text.split(/\r?\n/);
+    for(let i=0;i<lines.length;i++){
+      const trimmed=lines[i].trim();
+      if(!trimmed) continue;
+      const isEnv=lower==='.env'||lower.endsWith('/.env')||lower==='.env.local'||lower.endsWith('/.env.local')||lower==='.env.production'||lower.endsWith('/.env.production');
+      if(isEnv && !trimmed.startsWith('#') && trimmed.includes('=')){
+        const value=trimmed.substring(trimmed.indexOf('=')+1).trim().replace(/^['"]|['"]$/g,'');
+        if(value.length>=8&&!isPlaceholderSecret(value)&&!looksLikeKeyConstant(trimmed,value)) flagged.push({path,type:'Live Environment Secret (.env)',line:i+1,maskedSnippet:maskSecret(value),lineSnippet:trimmed});
+      }
+      for(const p of SECRET_PATTERNS){
+        p.re.lastIndex=0; let m;
+        while((m=p.re.exec(lines[i]))){
+          const value=m[1]||m[0];
+          if(looksLikePatternDefinition(trimmed)||isPlaceholderSecret(value)||looksLikeKeyConstant(trimmed,value)) continue;
+          if(p.name==='Hardcoded Code Secret / Credential' && !/\.(kt|java|js|ts)$/i.test(lower)) continue;
+          flagged.push({path,type:p.name,line:i+1,maskedSnippet:maskSecret(value),lineSnippet:trimmed});
+        }
+      }
+    }
+  }
+  return flagged.filter((x,i,a)=>i===a.findIndex(y=>y.path===x.path&&y.line===x.line&&y.type===x.type));
+}
+
+function openArtifactQr(id,name){
+  if(!state.isAuthenticated||!state.owner||!state.repo){toast('Connect GitHub first');return}
+  const url=`https://github.com/${encodeURIComponent(state.owner)}/${encodeURIComponent(state.repo)}/actions/artifacts/${id}/zip`;
+  document.getElementById('qrSub').textContent=name+' · scan to open the artifact download';
+  const box=document.getElementById('qrCanvas');box.innerHTML='';
+  if(window.QRCode)new QRCode(box,{text:url,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
+  document.getElementById('qrDownloadLink').href=url;openModal('qr');log('QR opened for artifact '+name,'info');
+}
+
+/* ============================= CI/CD ============================= */
+async function checkCiCdStatus(){
+  if(!state.isAuthenticated || !state.owner || !state.repo){ toast('Select a repo first'); return; }
+  state.isCheckingCiCd = true; renderCiCd();
+  try{
+    const data = await gh(`/repos/${state.owner}/${state.repo}/actions/runs?branch=${state.branch}&per_page=1`);
+    const run = data.workflow_runs && data.workflow_runs[0];
+    if(!run){ state.ciCdStatus = {none:true}; }
+    else{
+      let artifacts=[]; let completedSteps=0,totalSteps=0,currentStepName=''; let progressPercentage=run.status==='completed'&&run.conclusion==='success'?100:0;
+      try{
+        const jobsData=await gh(`/repos/${state.owner}/${state.repo}/actions/runs/${run.id}/jobs?per_page=100`);
+        const jobs=jobsData.jobs||[];
+        const steps=jobs.flatMap(j=>j.steps||[]); totalSteps=steps.length;
+        completedSteps=steps.filter(x=>x.status==='completed').length;
+        const active=steps.find(x=>x.status==='in_progress') || steps.find(x=>x.status==='queued');
+        currentStepName=active?.name || (steps.length ? steps[steps.length-1]?.name || '' : 'Starting runner…');
+        if(totalSteps) progressPercentage=Math.round((completedSteps/totalSteps)*100);
+        if(run.status==='completed') progressPercentage=run.conclusion==='success'?100:progressPercentage;
+      }catch(e){ currentStepName='GitHub Actions is running…'; }
+      if(run.status==='completed'){ try{const ar=await gh(`/repos/${state.owner}/${state.repo}/actions/runs/${run.id}/artifacts`); artifacts=ar.artifacts||[];}catch(e){} }
+      state.ciCdStatus={status:run.status,conclusion:run.conclusion,name:run.name||run.display_title,htmlUrl:run.html_url,updatedAt:run.updated_at,id:run.id,artifacts,completedSteps,totalSteps,currentStepName,progressPercentage};
+      log(`CI/CD: ${progressPercentage}% · ${currentStepName||'working'}`,'info');
+    }
+  }catch(e){ log('CI/CD fetch failed: '+e.message,'err'); state.ciCdStatus={error:e.message}; }
+  finally{ state.isCheckingCiCd=false; renderCiCd(); }
+}
+
+function renderCiCd(){
+  const el = document.getElementById('ciCdArea');
+  if(!state.owner || !state.repo){ el.innerHTML = `<div class="hint">Select a repository to track its Actions builds.</div>`; return; }
+  if(state.isCheckingCiCd){ el.innerHTML = `<div class="build-status"><div class="spinner" style="border-top-color:var(--app-purple);"></div><div class="build-info"><div class="btitle">Checking…</div></div></div>`; return; }
+  const s = state.ciCdStatus;
+  if(!s){ el.innerHTML = `<div class="hint">Tap ↻ to check the latest workflow run.</div>`; return; }
+  if(s.error){ el.innerHTML = `<div class="hint" style="color:var(--app-danger)">${s.error}</div>`; return; }
+  if(s.none){ el.innerHTML = `<div class="hint">No workflow runs found on <b>${state.branch}</b> yet.</div>`; return; }
+  const pct = Math.max(0,Math.min(100,Number(s.progressPercentage ?? (s.status==='completed' && s.conclusion==='success'?100:0))));
+  const dotCls = s.status!=='completed' ? 'running' : (s.conclusion==='success'?'success':'failure');
+  const label = s.status!=='completed' ? 'Building…' : (s.conclusion==='success'?'Build complete':'Build failed');
+  let artifactsHtml = '';
+  if(s.artifacts && s.artifacts.length){
+    artifactsHtml = s.artifacts.map(a=>`<div class="artifact-row"><div><div class="aname">📦 ${a.name}</div><div class="asize">${fmtBytes(a.size_in_bytes)}</div></div><button class="btn sm primary" onclick="downloadArtifactApk(${a.id},'${a.name}')">Download APK</button><button class="btn sm" onclick="openArtifactQr(${a.id},'${escapeHtml(a.name)}')">QR</button></div>`).join('');
+  }
+  el.innerHTML = `<div class="build-status"><div class="build-dot ${dotCls}"></div><div class="build-info"><div class="btitle">${label}</div><div class="bsub">${s.name} · ${timeAgo(s.updatedAt)}</div></div><a href="${s.htmlUrl}" target="_blank" class="btn sm">View</a></div><div class="live-progress"><div class="pct-row"><span>${s.currentStepName || (s.status==='completed' ? 'Build finished' : 'Waiting for runner…')}</span><span class="pct">${pct}%</span></div><div class="bar"><i style="width:${pct}%"></i></div><div class="step">${s.completedSteps ?? 0} / ${s.totalSteps ?? 0} workflow steps completed</div></div>${artifactsHtml}${s.status==='completed'&&s.conclusion!=='success'?`<div class="row" style="margin-top:10px"><button class="btn sm danger" onclick="openBuildFailure()">Build failure details · Fix with AI</button></div>`:''}`;
+}
+
+async function downloadArtifactApk(id, artifactName){
+  toast('Preparing APK…'); log('Downloading artifact '+artifactName+' and extracting APK','info');
+  try{
+    const res=await fetch(WEB_WORKER_ORIGIN+`/api/github/repos/${state.owner}/${state.repo}/actions/artifacts/${id}/zip`,{credentials:'include',headers:{'Accept':'application/vnd.github+json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const blob=await res.blob(); const zip=await JSZip.loadAsync(blob);
+    const apkEntry=Object.values(zip.files).find(f=>!f.dir && f.name.toLowerCase().endsWith('.apk'));
+    if(!apkEntry) throw new Error('No APK found inside the GitHub artifact');
+    const apkBlob=await apkEntry.async('blob'); const url=URL.createObjectURL(apkBlob);
+    const a=document.createElement('a'); a.href=url; a.download=apkEntry.name.split('/').pop()||'app-debug.apk'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500); log('APK downloaded: '+a.download,'ok'); toast('APK ready — download started');
+  }catch(e){ log('APK download failed: '+e.message,'err'); toast('APK download failed: '+e.message); }
+}
+
+async function downloadArtifact(id, filename){
+  toast('Downloading '+filename+'…');
+  log('Downloading artifact '+filename,'info');
+  try{
+    const res = await fetch(WEB_WORKER_ORIGIN+`/api/github/repos/${state.owner}/${state.repo}/actions/artifacts/${id}/zip`, {credentials:'include',headers:{'Accept':'application/vnd.github+json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+    URL.revokeObjectURL(url);
+    log('Artifact downloaded: '+filename,'ok');
+  }catch(e){
+    log('Artifact download failed: '+e.message,'err');
+    toast('Download failed: '+e.message);
+  }
+}
+
+/* ============================= PUSH PIPELINE (real Git Data API) ============================= */
+function onMainActionClick(){
+  if(state.isPushing || (state.ciCdStatus && state.ciCdStatus.status==='in_progress') || state.isExtracting) return;
+  if(!state.isAuthenticated){ openModal('config'); return; }
+  if(!state.extractedFiles.length){ document.getElementById('zipInput').click(); return; }
+  startPush();
+}
+function renderMainButton(){
+  const btn = document.getElementById('mainActionBtn');
+  const busy = state.isPushing || state.isExtracting;
+  if(busy){
+    btn.className = 'action-btn busy';
+    btn.innerHTML = `<span class="spinner"></span> ${state.pushStage || (state.isExtracting?'Extracting Project ZIP…':'Please wait…')}`;
+    btn.disabled = true; return;
+  }
+  btn.disabled = false;
+  if(!state.isAuthenticated){ btn.className='action-btn danger'; btn.innerHTML='Connect with GitHub'; return; }
+  if(!state.extractedFiles.length){ btn.className='action-btn warn'; btn.innerHTML='Please Select Your Project ZIP'; return; }
+  btn.className='action-btn green'; btn.innerHTML='Upload &amp; Push to GitHub';
+}
+
+function startPush(){
+  if(!state.owner || !state.repo){ toast('Set a target repo first'); openModal('config'); return; }
+  const secrets = scanSecrets(state.extractedFiles);
+  if(secrets.length){ renderSecretsModal(secrets); openModal('secrets'); return; }
+  openPushConfirm();
+}
+function renderSecretsModal(secrets){
+  const body = document.getElementById('secretsBody');
+  body.innerHTML = secrets.map(s=>`<div class="secret-item"><span class="spath">${s.path}</span> — <span class="stype">${s.type}</span></div>`).join('') +
+    `<div class="row" style="margin-top:14px;">
+      <button class="btn sm" onclick="closeModal('secrets')">Cancel push</button>
+      <button class="btn sm" onclick="excludeAndProceed()">Exclude these &amp; push</button>
+      <button class="btn sm" style="color:var(--app-danger);" onclick="closeModal('secrets');openPushConfirm();">Push anyway</button>
+    </div>`;
+  state._flaggedPaths = secrets.map(s=>s.path);
+}
+function excludeAndProceed(){
+  state.extractedFiles = state.extractedFiles.filter(f=>!state._flaggedPaths.includes(f.path));
+  log('Excluded '+state._flaggedPaths.length+' flagged file(s) from push','warn');
+  closeModal('secrets'); renderZipResult(); openPushConfirm();
+}
+function openPushConfirm(){
+  const total = state.extractedFiles.reduce((a,f)=>a+f.size,0) + (state.attachedJson?state.attachedJson.size:0) + (state.attachedKeystore?state.attachedKeystore.size:0);
+  const count = state.extractedFiles.length + (state.attachedJson?1:0) + (state.attachedKeystore?1:0);
+  document.getElementById('pushConfirmBody').innerHTML = `
+    <div class="repo-line" style="margin-bottom:14px;"><span class="owner">${state.owner}</span><span class="slash">/</span><span class="repo">${state.repo}</span><span class="branch">⑂ ${state.branch}</span></div>
+    <div class="row between" style="font-size:13px;padding:6px 0;"><span class="hint">Files</span><b>${count}</b></div>
+    <div class="row between" style="font-size:13px;padding:6px 0;"><span class="hint">Total size</span><b>${fmtBytes(total)}</b></div>
+    <label class="field-label" style="margin-top:10px;">Commit message</label>
+    <input type="text" id="pcMsg" value="${state.commitMessage}"/>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn sm" onclick="closeModal('pushconfirm')">Cancel</button>
+      <button class="btn primary sm" onclick="confirmAndPush()">Push now</button>
+    </div>`;
+  openModal('pushconfirm');
+}
+async function confirmAndPush(){
+  state.commitMessage = document.getElementById('pcMsg').value.trim() || state.commitMessage;
+  closeModal('pushconfirm');
+  await executePush();
+}
+
+const DEFAULT_WORKFLOW_PATH='.github/workflows/build.yml';
+const DEFAULT_WORKFLOW_CONTENT=`name: Android Build Debug APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Assemble Debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          validate-wrappers: false
+          gradle-version: '9.3.1'
+      - name: Accept Android SDK Licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses 2>/dev/null || true
+      - name: Ensure Debug Keystore Exists
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+      - name: Prepare Gradle Wrapper
+        run: |
+          chmod +x gradlew || true
+          mkdir -p gradle/wrapper
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            gradle wrapper --gradle-version 9.3.1 || true
+            chmod +x gradlew || true
+          fi
+      - name: Build Debug APK with Gradle
+        run: |
+          if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+          else
+            gradle assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+          fi
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: '**/build/outputs/apk/**/*.apk'
+          if-no-files-found: warn`;
+
+async function executePush(){
+  state.isPushing = true;
+  try{
+    // 1. Validate repo / get branch ref
+    state.pushStage = 'Validating Repository...'; renderMainButton();
+    log('Validating '+state.owner+'/'+state.repo+' @ '+state.branch,'info');
+    let refData;
+    try{
+      refData = await gh(`/repos/${state.owner}/${state.repo}/git/ref/heads/${state.branch}`);
+    }catch(e){
+      // branch doesn't exist -> branch off default branch
+      const repoInfo = await gh(`/repos/${state.owner}/${state.repo}`);
+      const baseRef = await gh(`/repos/${state.owner}/${state.repo}/git/ref/heads/${repoInfo.default_branch}`);
+      await gh(`/repos/${state.owner}/${state.repo}/git/refs`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ref:'refs/heads/'+state.branch, sha:baseRef.object.sha})});
+      log('Created new branch '+state.branch+' from '+repoInfo.default_branch,'ok');
+      refData = await gh(`/repos/${state.owner}/${state.repo}/git/ref/heads/${state.branch}`);
+    }
+    const commitSha = refData.object.sha;
+    const commitData = await gh(`/repos/${state.owner}/${state.repo}/git/commits/${commitSha}`);
+    const baseTreeSha = commitData.tree.sha;
+
+    // 2. Upload blobs
+    state.pushStage = 'Uploading Git Blobs...'; renderMainButton();
+    const allFiles = state.extractedFiles.slice();
+    if(!allFiles.some(f=>f.path.replaceAll('\\','/').startsWith('.github/workflows/'))){
+      allFiles.push({path:DEFAULT_WORKFLOW_PATH, bytes:new TextEncoder().encode(DEFAULT_WORKFLOW_CONTENT), isBinary:false});
+      log('Auto-injected GitHub Actions Android APK workflow','info');
+    }
+    if(state.attachedJson) allFiles.push({path:'app/google-services.json', bytes:state.attachedJson.bytes, isBinary:false});
+    if(state.attachedKeystore) allFiles.push({path:'app/debug.keystore.b64', bytes:state.attachedKeystore.bytes, isBinary:false});
+    const treeItems = [];
+    let i=0;
+    for(const f of allFiles){
+      i++;
+      const content = f.isBinary ? b64FromUint8(f.bytes) : b64FromUint8(f.bytes);
+      const blob = await gh(`/repos/${state.owner}/${state.repo}/git/blobs`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({content, encoding:'base64'})});
+      treeItems.push({path:f.path, mode:'100644', type:'blob', sha:blob.sha});
+      if(i%10===0 || i===allFiles.length) log(`Uploaded blob ${i}/${allFiles.length}`,'info');
+    }
+
+    // 3. Build tree
+    state.pushStage = 'Building Git Tree...'; renderMainButton();
+    const newTree = await gh(`/repos/${state.owner}/${state.repo}/git/trees`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({base_tree:baseTreeSha, tree:treeItems})});
+
+    // 4. Create commit
+    state.pushStage = 'Committing Source...'; renderMainButton();
+    const newCommit = await gh(`/repos/${state.owner}/${state.repo}/git/commits`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:state.commitMessage, tree:newTree.sha, parents:[commitSha]})});
+
+    // 5. Update ref
+    state.pushStage = 'Updating Branch Ref...'; renderMainButton();
+    await gh(`/repos/${state.owner}/${state.repo}/git/refs/heads/${state.branch}`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sha:newCommit.sha})});
+
+    log('Push complete: '+newCommit.sha.slice(0,7)+' — '+state.commitMessage,'ok');
+    toast('Pushed to '+state.owner+'/'+state.repo);
+    state.history.unshift({owner:state.owner, repo:state.repo, branch:state.branch, sha:newCommit.sha, message:state.commitMessage, filesCount:allFiles.length, totalBytes:allFiles.reduce((a,f)=>a+(f.size||f.bytes.length),0), timestamp:new Date().toISOString(), htmlUrl:newCommit.html_url});
+    persistHistory();
+    renderHistory();
+    setTimeout(checkCiCdStatus, 1500);
+    if(window._ciPoll) clearInterval(window._ciPoll);
+    window._ciPoll=setInterval(()=>{ if(state.ciCdStatus && state.ciCdStatus.status!=='completed') checkCiCdStatus(); },5000);
+  }catch(e){
+    log('Push failed: '+e.message,'err');
+    toast('Push failed: '+e.message);
+  }finally{
+    state.isPushing = false; state.pushStage='';
+    renderMainButton();
+  }
+}
+
+/* ============================= SINGLE FILE COMMIT ============================= */
+function openSingleFile(){ /* replaced by modal open call below */ }
+document.addEventListener('DOMContentLoaded', ()=>{
+  // wire the single-file modal body once
+});
+function renderSingleFileModal(){
+  const opts = state.extractedFiles.filter(f=>!f.isBinary).map(f=>`<option value="${f.path}">${f.path}</option>`).join('');
+  document.getElementById('singleFileBody').innerHTML = `
+    ${state.extractedFiles.length? `<label class="field-label">Pick from extracted files</label><select id="sfPick" onchange="loadSfContent(this.value)"><option value="">— choose —</option>${opts}</select>` : '<p class="hint">Extract a zip first, or type a path manually below.</p>'}
+    <label class="field-label" style="margin-top:10px;">File path in repo</label>
+    <input type="text" id="sfPath" placeholder="app/src/main/AndroidManifest.xml"/>
+    <label class="field-label" style="margin-top:10px;">Content</label>
+    <textarea id="sfContent" style="min-height:140px;"></textarea>
+    <label class="field-label" style="margin-top:10px;">Commit message</label>
+    <input type="text" id="sfMsg" value="Update via ZipToApk Web"/>
+    <button class="btn primary" style="margin-top:14px;width:100%;justify-content:center;" onclick="commitSingleFile()">Commit file</button>`;
+}
+function loadSfContent(path){
+  if(!path) return;
+  const f = state.extractedFiles.find(x=>x.path===path);
+  if(!f) return;
+  document.getElementById('sfPath').value = path;
+  document.getElementById('sfContent').value = new TextDecoder('utf-8').decode(f.bytes);
+}
+async function commitSingleFile(){
+  if(!state.isAuthenticated || !state.owner || !state.repo){ toast('Connect &amp; select a repo first'); return; }
+  const path = document.getElementById('sfPath').value.trim();
+  const content = document.getElementById('sfContent').value;
+  const msg = document.getElementById('sfMsg').value.trim() || 'Update via ZipToApk Web';
+  if(!path){ toast('Enter a file path'); return; }
+  log('Committing single file '+path,'info');
+  try{
+    let sha;
+    try{
+      const existing = await gh(`/repos/${state.owner}/${state.repo}/contents/${encodeURIComponent(path)}?ref=${state.branch}`);
+      sha = existing.sha;
+    }catch(e){ /* file doesn't exist yet */ }
+    await gh(`/repos/${state.owner}/${state.repo}/contents/${encodeURIComponent(path)}`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg, content:utf8ToB64(content), branch:state.branch, sha})
+    });
+    log('Committed '+path,'ok');
+    toast('File committed: '+path);
+    closeModal('singleFile');
+  }catch(e){
+    log('Single file commit failed: '+e.message,'err');
+    toast('Commit failed: '+e.message);
+  }
+}
+
+/* ============================= VERSIONS ============================= */
+async function openVersions(){
+  if(!state.isAuthenticated || !state.owner || !state.repo){ toast('Connect &amp; select a repo first'); return; }
+  openModal('versions');
+  document.getElementById('versionsBody').innerHTML = '<div class="empty-note">Loading…</div>';
+  try{
+    const commits = await gh(`/repos/${state.owner}/${state.repo}/commits?sha=${state.branch}&per_page=15`);
+    document.getElementById('versionsBody').innerHTML = commits.map(c=>`
+      <div class="hist-row">
+        <div class="hdot"></div>
+        <div class="hinfo"><div class="htitle">${(c.commit.message||'').split('\\n')[0]}</div><div class="hsub">${c.sha.slice(0,7)} · ${c.commit.author.name} · ${timeAgo(c.commit.author.date)}</div></div>
+        <div class="row">
+          <button class="btn sm" onclick="downloadZipball('${c.sha}')">⭳</button>
+          <button class="btn sm" onclick="restoreVersion('${c.sha}')">Restore</button>
+        </div>
+      </div>`).join('') || '<div class="empty-note">No commits yet.</div>';
+  }catch(e){
+    document.getElementById('versionsBody').innerHTML = `<div class="empty-note" style="color:var(--app-danger)">${e.message}</div>`;
+  }
+}
+async function downloadZipball(sha){
+  toast('Downloading snapshot…');
+  try{
+    const res = await fetch(WEB_WORKER_ORIGIN+`/api/github/repos/${state.owner}/${state.repo}/zipball/${sha}`, {credentials:'include',headers:{'Accept':'application/vnd.github+json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=state.repo+'-'+sha.slice(0,7)+'.zip'; a.click();
+    URL.revokeObjectURL(url);
+    log('Downloaded snapshot '+sha.slice(0,7),'ok');
+  }catch(e){ log('Download failed: '+e.message,'err'); toast('Download failed'); }
+}
+async function restoreVersion(sha){
+  if(!window.confirm('Restore '+sha.slice(0,7)+' on '+state.branch+'? This creates a new commit using that historical tree.')) return;
+  try{
+    log('Restoring snapshot '+sha.slice(0,7)+'…','info');
+    const oldCommit = await gh(`/repos/${state.owner}/${state.repo}/git/commits/${sha}`);
+    const refData = await gh(`/repos/${state.owner}/${state.repo}/git/ref/heads/${state.branch}`);
+    const newCommit = await gh(`/repos/${state.owner}/${state.repo}/git/commits`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:'Restore snapshot '+sha.slice(0,7), tree:oldCommit.tree.sha, parents:[refData.object.sha]})});
+    await gh(`/repos/${state.owner}/${state.repo}/git/refs/heads/${state.branch}`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sha:newCommit.sha})});
+    log('Restored to snapshot '+sha.slice(0,7),'ok');
+    toast('Branch restored');
+    closeModal('versions');
+  }catch(e){ log('Restore failed: '+e.message,'err'); toast('Restore failed'); }
+}
+
+/* ============================= ADDITIONAL FILES ============================= */
+let pendingInputType=null;
+function openInputModal(type){pendingInputType=type;document.getElementById('inputTitle').textContent=type==='json'?'Paste Google Services JSON':'Paste Debug Keystore Base64';document.getElementById('inputSub').textContent=type==='json'?'Raw google-services.json content':'Base64 string used to preserve the debug keystore/SHA-1';document.getElementById('inputValue').value='';document.getElementById('inputConfirmBtn').textContent=type==='json'?'Inject JSON':'Apply';openModal('input');}
+function confirmGenericInput(){const text=document.getElementById('inputValue').value.trim();if(!text){toast('Paste content first');return}if(pendingInputType==='json'){state.attachedJson={name:'google-services.json',size:new TextEncoder().encode(text).length,bytes:new TextEncoder().encode(text)};log('Attached google-services.json','ok')}else{state.attachedKeystore={name:'debug.keystore.b64',size:new TextEncoder().encode(text).length,bytes:new TextEncoder().encode(text)};log('Attached debug keystore base64','ok')}renderAdditionalFiles();closeModal('input');}
+function pasteJson(){openInputModal('json')}
+function pasteKeystore(){openInputModal('keystore')}
+function renderAdditionalFiles(){
+  const el = document.getElementById('additionalFilesArea');
+  let html='';
+  if(state.attachedJson) html += `<div class="zip-file-row" style="margin-bottom:6px;"><div class="fic">🧩</div><div><div class="fname">${state.attachedJson.name}</div><div class="fmeta">${fmtBytes(state.attachedJson.size)}</div></div><button class="btn sm" style="margin-left:auto;" onclick="state.attachedJson=null;renderAdditionalFiles();">✕</button></div>`;
+  if(state.attachedKeystore) html += `<div class="zip-file-row"><div class="fic">🔑</div><div><div class="fname">${state.attachedKeystore.name}</div><div class="fmeta">${fmtBytes(state.attachedKeystore.size)}</div></div><button class="btn sm" style="margin-left:auto;" onclick="state.attachedKeystore=null;renderAdditionalFiles();">✕</button></div>`;
+  el.innerHTML = html;
+}
+
+/* ============================= AI ASSISTANT (real Gemini call) ============================= */
+function saveGeminiConfig(){
+  state.geminiKey = document.getElementById('geminiKeyInput').value.trim() || null;
+  state.geminiModel = document.getElementById('geminiModelSelect').value;
+  document.getElementById('geminiCfgBtn').textContent = state.geminiKey ? '✓ Key set' : 'Configure Key';
+  closeModal('gemini');
+  toast(state.geminiKey ? 'Gemini key saved' : 'Key cleared');
+}
+function clearGeminiKey(){
+  state.geminiKey=null;
+  document.getElementById('geminiKeyInput').value='';
+  document.getElementById('geminiCfgBtn').textContent='Configure Key';
+  toast('Gemini key cleared');
+}
+
+let selectedAiMode='FIX_BUGS';
+function selectAiMode(mode){
+  selectedAiMode=mode;
+  document.querySelectorAll('#aiModeRow .ai-mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+  const p=document.getElementById('aiPrompt');
+  const hints={
+    FIX_BUGS:'e.g. Fix crash when clicking login button or paste build error log...',
+    ADD_FEATURE:'e.g. Add a dark mode toggle button in SettingsScreen...',
+    OPTIMIZE_CODE:'e.g. Clean up coroutines and optimize this code...',
+    EXPLAIN_CODE:'e.g. Explain the architecture and how this project works...'
+  };
+  if(p && (!p.value.trim() || p.dataset.quick==='1')) p.placeholder=hints[mode];
+  if(p) p.dataset.quick='';
+}
+function useAiQuick(text){
+  const p=document.getElementById('aiPrompt'); if(!p)return;
+  p.value=text; p.dataset.quick='1'; p.focus();
+  if(text.toLowerCase().includes('crash')||text.toLowerCase().includes('error')) selectAiMode('FIX_BUGS');
+  else if(text.toLowerCase().includes('dark mode')) selectAiMode('ADD_FEATURE');
+  else selectAiMode('OPTIMIZE_CODE');
+}
+async function runAiTask(){
+  const rawPrompt = document.getElementById('aiPrompt').value.trim();
+  const prompt = rawPrompt ? `[Task type: ${selectedAiMode}]\n${rawPrompt}` : '';
+  if(!prompt){ toast('Write a prompt first'); return; }
+  if(!state.geminiKey){ openModal('gemini'); return; }
+  if(!state.extractedFiles.length){ toast('Select and inspect a project ZIP first'); return; }
+  state.isAiRunning = true;
+  document.getElementById('aiRunBtn').disabled = true;
+  document.getElementById('aiStatusText').textContent = 'Scanning project…';
+  document.getElementById('aiResultArea').innerHTML='';
+  log('AI task started: '+prompt.slice(0,80),'info');
+  try{
+    const codeFiles = state.extractedFiles.filter(f=>!f.isBinary && isAiCodeFile(f.path));
+    let totalChars = 0;
+    const selected = [];
+    for(const f of codeFiles){
+      if(totalChars >= 40000) break;
+      const text = new TextDecoder('utf-8').decode(f.bytes);
+      const take = text.slice(0, Math.min(text.length, 25000, 40000-totalChars));
+      selected.push({path:f.path, content:take}); totalChars += take.length;
+    }
+    const tree = state.extractedFiles.map(f=>f.path).slice(0,800).join('\n');
+    const context = selected.map(f=>`--- FILE: ${f.path} ---\n${f.content}\n--- END FILE ---`).join('\n\n');
+    document.getElementById('aiStatusText').textContent = 'Consulting Gemini…';
+    const instruction = `You are an expert Android software engineer and code fixer. Analyze the supplied project and user request. If a bug or build problem is described, identify the root cause and provide complete file replacements. Return ONLY valid JSON with this exact shape: {"bugAnalysis":"...","solutionExplanation":"...","modifiedFiles":[{"filePath":"relative/path","changeType":"MODIFIED|ADDED|DELETED","fileSummary":"...","newContent":"FULL COMPLETE FILE CONTENT"}]}. Never return placeholders or partial files. Do not modify secrets or credentials. USER REQUEST: ${prompt}\n\nPROJECT TREE:\n${tree}\n\nRELEVANT SOURCE:\n${context}`;
+    const body={contents:[{parts:[{text:instruction}]}]};
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${state.geminiModel}:generateContent?key=${encodeURIComponent(state.geminiKey)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||('HTTP '+res.status));}
+    const data=await res.json();
+    const raw=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('\n')||'';
+    const clean=raw.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+    const first=clean.indexOf('{'), last=clean.lastIndexOf('}');
+    if(first<0||last<first) throw new Error('AI did not return the required JSON change plan.');
+    const result=JSON.parse(clean.slice(first,last+1));
+    const changes=Array.isArray(result.modifiedFiles)?result.modifiedFiles.filter(x=>x&&x.filePath&&x.newContent!==undefined):[];
+    state.aiPendingChanges=changes;
+    state.aiPendingResult=result;
+    renderAiPreview(result,changes);
+    document.getElementById('aiResultArea').innerHTML=`<div class="ai-result"><b>${escapeHtml(result.bugAnalysis||'Analysis complete')}</b><br><br>${escapeHtml(result.solutionExplanation||'Review the proposed file changes below.')}</div><div class="ai-actions"><button class="btn primary sm" onclick="openModal('aiPreview')">Review & Apply Changes</button><button class="btn sm" onclick="openUiPreview()">UI / Source Preview</button></div>`;
+    log('AI produced '+changes.length+' file change(s) — awaiting confirmation','ok');
+  }catch(e){
+    document.getElementById('aiResultArea').innerHTML=`<div class="ai-result" style="color:var(--app-danger)">${escapeHtml(e.message)}</div>`;
+    log('AI task failed: '+e.message,'err');
+  }finally{
+    state.isAiRunning=false; document.getElementById('aiRunBtn').disabled=false; document.getElementById('aiStatusText').textContent='';
+  }
+}
+function isAiCodeFile(path){return /\.(kt|kts|java|xml|gradle|properties|json|js|ts|tsx|jsx|html|css|md|txt|yml|yaml)$/i.test(path)}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderAiPreview(result,changes){
+  const body=document.getElementById('aiPreviewBody');
+  body.innerHTML=`<div class="ai-result"><b>Analysis</b><br>${escapeHtml(result.bugAnalysis||'N/A')}<br><br><b>Solution</b><br>${escapeHtml(result.solutionExplanation||'')}</div>`+
+    (changes.length?changes.map((c,i)=>`<div class="ai-change"><div class="path">${i+1}. ${escapeHtml(c.filePath)} · ${escapeHtml(c.changeType||'MODIFIED')}</div><div class="summary">${escapeHtml(c.fileSummary||'No summary provided')}</div></div>`).join(''):'<div class="empty-note">No file changes were proposed.</div>')+
+    `<div class="row" style="margin-top:15px;"><button class="btn sm" onclick="closeModal('aiPreview')">Cancel</button><button class="btn primary sm" onclick="confirmApplyAiChanges()" ${changes.length?'':'disabled'}>Apply Changes</button></div>`;
+}
+function confirmApplyAiChanges(){
+  if(!state.aiPendingChanges.length){closeModal('aiPreview');return;}
+  if(!window.confirm('Apply '+state.aiPendingChanges.length+' AI-generated file change(s) to the current project buffer? Nothing is pushed to GitHub until you confirm the later Push dialog.')) return;
+  const changed=[];
+  for(const c of state.aiPendingChanges){
+    const path=String(c.filePath).replace(/^\/+/, '').replaceAll('\\','/');
+    if(path.split('/').includes('..')) continue;
+    const idx=state.extractedFiles.findIndex(f=>f.path===path);
+    if(String(c.changeType).toUpperCase()==='DELETED'){if(idx>=0) state.extractedFiles.splice(idx,1); changed.push(path); continue;}
+    const bytes=new TextEncoder().encode(String(c.newContent));
+    if(idx>=0) state.extractedFiles[idx]={...state.extractedFiles[idx],bytes,size:bytes.length,isBinary:false};
+    else state.extractedFiles.push({path,bytes,size:bytes.length,isBinary:false});
+    changed.push(path);
+  }
+  state.extractedFiles.sort((a,b)=>a.path.localeCompare(b.path));
+  closeModal('aiPreview'); renderZipResult(); renderMainButton(); openInspect();
+  log('Applied '+changed.length+' AI file change(s) to project buffer','ok'); toast('AI changes applied — review then push to GitHub');
+}
+
+
+/* ============================= CONSOLE / HISTORY RENDER ============================= */
+function renderConsole(){
+  const el = document.getElementById('consoleArea');
+  if(!state.consoleLogs.length){ el.innerHTML = '<div class="console-empty">No activity yet — logs will stream here as you work.</div>'; return; }
+  el.innerHTML = state.consoleLogs.slice(-100).map(l=>`<div class="cline ${l.cls}"><span class="ts">${l.ts}</span>${l.msg}</div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function copyLogs(){
+  const text = state.consoleLogs.map(l=>`[${l.ts}] ${l.msg}`).join('\\n');
+  navigator.clipboard.writeText(text).then(()=>toast('Logs copied')).catch(()=>toast('Copy failed'));
+}
+function clearLogs(){ state.consoleLogs=[]; renderConsole(); }
+
+function renderHistory(){
+  const el = document.getElementById('historyArea');
+  if(!state.history.length){ el.innerHTML = '<div class="empty-note">Nothing pushed yet this session.</div>'; return; }
+  el.innerHTML = state.history.map(h=>`
+    <div class="hist-row">
+      <div class="hdot"></div>
+      <div class="hinfo"><div class="htitle">${h.message}</div><div class="hsub">${h.owner}/${h.repo} · ${h.sha.slice(0,7)} · ${h.filesCount} files · ${timeAgo(h.timestamp)}</div></div>
+      <a href="${h.htmlUrl}" target="_blank" class="btn sm">View</a>
+    </div>`).join('');
+}
+function clearHistory(){ state.history=[]; renderHistory(); persistHistory(); }
+async function persistHistory(){
+  try{ if(window.storage) await window.storage.set('push-history', JSON.stringify(state.history.slice(0,30))); }catch(e){}
+}
+async function restoreHistory(){
+  try{
+    if(!window.storage) return;
+    const r = await window.storage.get('push-history');
+    if(r && r.value) state.history = JSON.parse(r.value);
+  }catch(e){}
+  renderHistory();
+}
+
+/* ============================= PLAY STORE ============================= */
+const PLAY_STORE_URL = "https://play.google.com/store/search?q=ZipToApk&c=apps";
+function openAndroidApp(){ window.open(PLAY_STORE_URL,"_blank","noopener,noreferrer"); }
+
+/* ============================= SOURCE-COMPARED WEB PARITY ADDITIONS ============================= */
+function openCustomConfirm(title, sub, html, confirmText, onConfirm, danger=false){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmSub').textContent=sub;
+  document.getElementById('confirmBody').innerHTML=html+`<div class="row" style="margin-top:15px;justify-content:flex-end"><button class="btn sm" onclick="closeModal('confirm')">Cancel</button><button class="btn sm ${danger?'danger':''} primary" id="genericConfirmBtn">${confirmText}</button></div>`;
+  document.getElementById('genericConfirmBtn').onclick=()=>{closeModal('confirm');onConfirm();};
+  openModal('confirm');
+}
+function openBuildFailure(){
+  const s=state.ciCdStatus||{};
+  const url=s.htmlUrl||'#';
+  document.getElementById('buildFailureBody').innerHTML=`<div class="danger-box"><b>${escapeHtml(s.name||'GitHub Actions build failed')}</b><br><span class="hint">${escapeHtml(s.conclusion||'failure')} · ${escapeHtml(s.currentStepName||'Build step')}</span></div><div class="preview-code" style="margin-top:10px">${escapeHtml(state.consoleLogs.slice(-35).map(x=>`[${x.ts}] ${x.msg}`).join('\n'))}</div><div class="row" style="margin-top:12px"><a class="btn sm" href="${escapeHtml(url)}" target="_blank">Open Actions ↗</a><button class="btn sm primary" onclick="closeModal('buildFailure');document.getElementById('aiPrompt').value='Fix this Android build failure. Review the project and the latest GitHub Actions failure shown in the console:\n\n'+state.consoleLogs.slice(-35).map(x=>x.msg).join('\n');document.getElementById('aiPrompt').scrollIntoView({behavior:'smooth'});document.getElementById('aiPrompt').focus();">✦ Fix with AI</button></div>`;
+  openModal('buildFailure');
+}
+function openUiPreview(){
+  const files=state.extractedFiles.filter(f=>!f.isBinary && /\.(kt|java|xml|html|css|js|tsx|jsx)$/i.test(f.path)).slice(0,20);
+  document.getElementById('uiPreviewBody').innerHTML=files.length?files.map((f,i)=>{const text=new TextDecoder().decode(f.bytes);return `<details ${i===0?'open':''}><summary>${escapeHtml(f.path)}</summary><div class="preview-code">${escapeHtml(text.slice(0,12000))}</div></details>`}).join(''):'<div class="empty-note">No previewable source files found.</div>';
+  openModal('uiPreview');
+}
+function openSnapshotConfirm(type,sha){
+  const action=type==='restore'?'Restore this version':'Download this version';
+  openCustomConfirm(action,'Historical Git commit '+sha.slice(0,7),`<div class="hint">${type==='restore'?'A restore creates a new commit using the historical tree; it does not rewrite history.':'The repository snapshot ZIP will be downloaded from GitHub.'}</div>`,action,()=>{if(type==='restore') restoreVersion(sha);else downloadZipball(sha);});
+}
+function openDeleteConfirm(sha){
+  openCustomConfirm('Delete version','Remove this version from the local version list.',`<div class="danger-box">Version <b>${escapeHtml(sha.slice(0,7))}</b> is selected. The web version should not silently delete remote Git history.</div>`,'Remove',()=>{state.history=state.history.filter(x=>x.sha!==sha);renderHistory();persistHistory();toast('Removed from local session history')},true);
+}
+async function createRepoFromWeb(){
+  if(!state.isAuthenticated){toast('Connect GitHub first');return;}
+  const name=(document.getElementById('newRepoName')?.value||'').trim();
+  const description=(document.getElementById('newRepoDesc')?.value||'').trim();
+  const isPrivate=document.getElementById('newRepoPrivate')?.checked!==false;
+  if(!name){toast('Repository name is required');return;}
+  try{
+    const repo=await gh('/user/repos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,description,private:isPrivate,auto_init:true})});
+    state.owner=repo.owner.login;state.repo=repo.name;state.branch=repo.default_branch||'main';
+    renderRepoLine();renderMainButton();closeModal('repopicker');toast('Repository created and selected');log('Created repository '+repo.full_name,'ok');fetchUserRepos();
+  }catch(e){toast('Repository creation failed: '+e.message);log('Create repo failed: '+e.message,'err');}
+}
+async function checkRemoteConfig(){
+  const el=document.getElementById('remoteControlArea');
+  el.innerHTML='<div class="hint">Checking remote configuration…</div>';
+  try{
+    const urls=['https://raw.githubusercontent.com/akhandpratap1/remote-control/main/remote_config.json','https://raw.githubusercontent.com/akhandpratap1/remote-control/master/remote_config.json'];
+    let data=null,last='';
+    for(const u of urls){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){data=await r.json();break}last='HTTP '+r.status}catch(e){last=e.message}}
+    if(!data){el.innerHTML='<div class="hint">Remote configuration unavailable. '+escapeHtml(last)+'</div>';return}
+    const faqs=Array.isArray(data.faqs)?data.faqs:[]; const videos=Array.isArray(data.tutorial_videos)?data.tutorial_videos:[];
+    el.innerHTML=`<div class="row" style="flex-wrap:wrap"><span class="source-chip">latest ${escapeHtml(data.latest_version_code??'—')}</span><span class="source-chip">${data.ads_enabled?'ads enabled':'ads disabled'}</span><span class="source-chip">${videos.length} tutorial(s)</span><span class="source-chip">${faqs.length} FAQ(s)</span></div>`+(data.announcement?`<div class="success-box" style="margin-top:10px"><b>${escapeHtml(data.announcement.title||'Announcement')}</b><br><span class="hint">${escapeHtml(data.announcement.message||'')}</span></div>`:'');
+    state.remoteConfig=data;log('Remote configuration refreshed','ok');
+  }catch(e){el.innerHTML='<div class="hint" style="color:var(--app-danger)">'+escapeHtml(e.message)+'</div>';}
+}
+function renderMainActionParity(){
+  if(state.ciCdStatus?.status==='completed' && state.ciCdStatus?.conclusion==='failure'){
+    const btn=document.getElementById('mainActionBtn'); if(btn){btn.className='action-btn danger';btn.disabled=false;btn.innerHTML='Build failed · Review / Fix';btn.onclick=openBuildFailure;}
+  } else {
+    const btn=document.getElementById('mainActionBtn'); if(btn) btn.onclick=onMainActionClick;
+  }
+}
+const _renderCiCdParity=renderCiCd;
+renderCiCd=function(){_renderCiCdParity();renderMainActionParity();};
+const _checkCiCdParity=checkCiCdStatus;
+checkCiCdStatus=async function(){await _checkCiCdParity();renderMainActionParity();};
+const _origConfirmApplyAiChanges=confirmApplyAiChanges;
+confirmApplyAiChanges=function(){
+  if(!state.aiPendingChanges?.length){closeModal('aiPreview');return;}
+  openCustomConfirm('Apply AI changes','Nothing is pushed until the later GitHub push confirmation.',`<div class="hint">Gemini proposed <b>${state.aiPendingChanges.length}</b> file change(s). Review the file list before applying them to the project buffer.</div>`, 'Apply changes', ()=>{
+    const changed=[];for(const c of state.aiPendingChanges){const path=String(c.filePath).replace(/^\/+/, '').replaceAll('\\','/');if(path.split('/').includes('..'))continue;const idx=state.extractedFiles.findIndex(f=>f.path===path);if(String(c.changeType).toUpperCase()==='DELETED'){if(idx>=0)state.extractedFiles.splice(idx,1);changed.push(path);continue}const bytes=new TextEncoder().encode(String(c.newContent));if(idx>=0)state.extractedFiles[idx]={...state.extractedFiles[idx],bytes,size:bytes.length,isBinary:false};else state.extractedFiles.push({path,bytes,size:bytes.length,isBinary:false});changed.push(path)}state.extractedFiles.sort((a,b)=>a.path.localeCompare(b.path));closeModal('aiPreview');renderZipResult();renderMainButton();openInspect();log('Applied '+changed.length+' AI file change(s) to project buffer','ok');toast('AI changes applied — review then push to GitHub');
+  });
+};
+
+/* ============================= INIT ============================= */
+document.getElementById('modal-singleFile').addEventListener('transitionend',()=>{});
+const origOpenModal = openModal;
+openModal = function(name){
+  if(name==='config') renderConfigModal();
+  if(name==='singleFile') renderSingleFileModal();
+  origOpenModal(name);
+};
+
+renderAuthArea(); renderRepoLine(); renderMainButton(); renderCiCd(); renderConsole(); renderHistory(); renderAdditionalFiles();
+log('ZipToApk Web ready. Connect GitHub securely to get started.','info');
+restoreHistory();
+handleOAuthReturn();
+restoreWebSession();
+
+</script>
+
+<script>
+/* ---------- LANDING <-> APP VIEW SWITCH ---------- */
+function showApp(){
+  document.body.classList.add('app-active');
+  window.scrollTo(0,0);
+}
+function showLanding(){
+  document.body.classList.remove('app-active');
+  window.scrollTo(0,0);
+}
+</script>
+
+</body>
+</html>
