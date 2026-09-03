@@ -1,65 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-
-  <title>Privacy Policy | ZipToApk</title>
-
-  <meta
-    name="description"
-    content="ZipToApk Privacy Policy describing how GitHub, Cloudflare, Google Gemini, Google Mobile Ads, project files, credentials, and build artifacts are handled."
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Privacy Policy for ZipToApk">
+  <meta name="robots" content="index, follow">
+  <title>Privacy Policy — ZipToApk</title>
 
   <style>
     :root {
-      --bg: #0b0f17;
-      --surface: #111827;
-      --surface-2: #151d2b;
-      --border: rgba(255, 255, 255, 0.09);
-      --text: #f4f7fb;
-      --muted: #aab4c5;
-      --accent: #8b5cf6;
-      --accent-2: #a78bfa;
-      --success: #22c55e;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --bg: #080b10;
+      --surface: #10161e;
+      --border: #26303c;
+      --text: #edf2f7;
+      --muted: #9aa6b5;
+      --green: #00e6a0;
+      --blue: #4aa3ff;
+      --purple: #c084ff;
+      --orange: #ff8a25;
+      --max-width: 900px;
     }
 
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     html {
       scroll-behavior: smooth;
+      background: var(--bg);
     }
 
     body {
-      margin: 0;
+      min-height: 100vh;
       background:
         radial-gradient(
-          circle at top,
-          rgba(139, 92, 246, 0.12),
-          transparent 38%
+          circle at 50% -10%,
+          rgba(0, 230, 160, 0.07),
+          transparent 34rem
         ),
         var(--bg);
       color: var(--text);
       font-family:
         Inter,
+        system-ui,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
         sans-serif;
-      line-height: 1.7;
+      line-height: 1.65;
     }
 
     a {
-      color: var(--accent-2);
+      color: var(--green);
       text-decoration: none;
     }
 
@@ -67,207 +61,244 @@
       text-decoration: underline;
     }
 
-    .page {
-      width: min(100% - 32px, 960px);
+    .container {
+      width: min(calc(100% - 32px), var(--max-width));
       margin: 0 auto;
-      padding: clamp(36px, 7vw, 80px) 0;
     }
 
-    .hero {
-      text-align: center;
-      margin-bottom: clamp(28px, 5vw, 48px);
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 11, 16, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    .badge {
-      display: inline-flex;
+    .nav {
+      min-height: 72px;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 7px 13px;
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      border-radius: 999px;
-      background: rgba(139, 92, 246, 0.08);
-      color: var(--accent-2);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-    }
-
-    .hero h1 {
-      margin: 18px 0 10px;
-      font-size: clamp(32px, 6vw, 52px);
-      line-height: 1.12;
-      letter-spacing: -1.2px;
-    }
-
-    .hero p {
-      margin: 0 auto;
-      max-width: 720px;
-      color: var(--muted);
-      font-size: clamp(15px, 2.5vw, 18px);
-    }
-
-    .updated {
-      margin-top: 16px;
-      color: #8f9bad;
-      font-size: 13px;
-    }
-
-    .notice {
-      margin-bottom: 22px;
-      padding: clamp(18px, 4vw, 24px);
-      border: 1px solid rgba(34, 197, 94, 0.28);
-      border-radius: 18px;
-      background: rgba(34, 197, 94, 0.055);
-      box-shadow: var(--shadow);
-    }
-
-    .notice strong {
-      display: block;
-      margin-bottom: 7px;
-      color: #eafff0;
-      font-size: 16px;
-    }
-
-    .notice p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .content {
-      display: grid;
+      justify-content: space-between;
       gap: 16px;
     }
 
-    .section {
-      padding: clamp(20px, 4vw, 30px);
-      background: linear-gradient(
-        145deg,
-        rgba(21, 29, 43, 0.98),
-        rgba(15, 22, 34, 0.98)
-      );
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
+    .brand {
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
     }
 
-    .section h2 {
-      margin: 0 0 14px;
-      font-size: clamp(19px, 3vw, 23px);
-      line-height: 1.3;
+    .brand span {
+      color: var(--green);
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      white-space: nowrap;
+      transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .back-button:hover {
+      text-decoration: none;
+      border-color: rgba(0, 230, 160, 0.45);
+      transform: translateY(-1px);
+    }
+
+    main {
+      padding: 54px 0 70px;
+    }
+
+    .hero {
+      padding: 30px 0 36px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      margin-bottom: 14px;
+      color: var(--orange);
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin-bottom: 12px;
+      font-size: clamp(34px, 7vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -1.8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .updated {
+      display: inline-flex;
+      margin-top: 20px;
+      padding: 8px 11px;
+      border: 1px solid rgba(74, 163, 255, 0.25);
+      border-radius: 9px;
+      background: rgba(74, 163, 255, 0.07);
+      color: #b9c9da;
+      font-size: 12px;
+    }
+
+    .notice {
+      margin: 28px 0;
+      padding: 18px;
+      border: 1px solid rgba(0, 230, 160, 0.25);
+      border-radius: 14px;
+      background: rgba(0, 230, 160, 0.055);
+      color: var(--muted);
+    }
+
+    .notice strong {
+      color: var(--green);
+    }
+
+    .card {
+      margin: 16px 0;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(16, 22, 30, 0.98),
+          rgba(12, 17, 24, 0.98)
+        );
+    }
+
+    .card h2 {
+      margin-bottom: 12px;
+      color: var(--text);
+      font-size: 21px;
+      font-weight: 700;
       letter-spacing: -0.3px;
     }
 
-    .section h3 {
-      margin: 22px 0 7px;
-      font-size: 16px;
-      line-height: 1.4;
-    }
-
-    .section h3:first-of-type {
-      margin-top: 0;
-    }
-
-    .section p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .section p:last-child {
-      margin-bottom: 0;
-    }
-
-    .section ul {
-      margin: 8px 0 14px;
-      padding-left: 21px;
+    .card p {
+      margin: 8px 0;
       color: var(--muted);
     }
 
-    .section li {
+    .card ul {
+      margin: 10px 0;
+      padding-left: 22px;
+      color: var(--muted);
+    }
+
+    .card li {
       margin: 7px 0;
-      font-size: 15px;
     }
 
-    .section li::marker {
-      color: var(--accent-2);
+    .card strong {
+      color: #dce5ee;
     }
 
     .contact {
-      display: grid;
-      gap: 9px;
-      margin-top: 8px;
+      margin-top: 30px;
+      padding: 25px 18px;
+      border: 1px solid rgba(192, 132, 255, 0.22);
+      border-radius: 15px;
+      background: rgba(192, 132, 255, 0.05);
+      text-align: center;
     }
 
-    .contact-row {
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      overflow-wrap: anywhere;
+    .contact p {
+      margin: 5px 0;
+      color: var(--muted);
     }
 
-    .contact-label {
-      display: block;
-      margin-bottom: 2px;
-      color: #e7ebf3;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .link-chip {
-      display: inline-flex;
-      align-items: center;
-      min-height: 40px;
-      padding: 8px 13px;
-      border: 1px solid rgba(139, 92, 246, 0.25);
-      border-radius: 11px;
-      background: rgba(139, 92, 246, 0.07);
-      font-size: 13px;
-      font-weight: 650;
+    .email {
+      display: inline-block;
+      margin-top: 7px;
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+      font-size: 15px;
+      font-weight: 600;
     }
 
     footer {
-      margin-top: 34px;
-      padding: 22px 0 5px;
+      padding: 25px 16px 35px;
       border-top: 1px solid var(--border);
+      color: #778394;
+      font-size: 12px;
       text-align: center;
-      color: #7f899a;
-      font-size: 13px;
     }
 
     @media (max-width: 600px) {
-      .page {
-        width: min(100% - 22px, 960px);
-        padding-top: 28px;
+      .container {
+        width: min(calc(100% - 24px), var(--max-width));
       }
 
-      .section {
-        border-radius: 16px;
+      .nav {
+        min-height: 62px;
       }
 
-      .notice {
-        border-radius: 16px;
+      .brand {
+        font-size: 18px;
       }
 
-      .section p,
-      .section li {
+      .back-button {
+        min-height: 38px;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+
+      main {
+        padding-top: 30px;
+      }
+
+      .hero {
+        padding-top: 18px;
+      }
+
+      .subtitle {
         font-size: 14px;
       }
 
-      .links {
-        display: grid;
+      .card {
+        padding: 18px;
+        border-radius: 13px;
       }
 
-      .link-chip {
-        width: 100%;
+      .card h2 {
+        font-size: 19px;
+      }
+
+      .notice {
+        padding: 16px;
       }
     }
   </style>
@@ -275,399 +306,496 @@
 
 <body>
 
-  <main class="page">
+  <header>
+    <div class="container nav">
 
-    <header class="hero">
-      <div class="badge">Privacy &amp; Data Safety</div>
+      <div class="brand">
+        ZipTo<span>Apk</span>
+      </div>
 
-      <h1>ZipToApk Privacy Policy</h1>
+      <a class="back-button" href="../index.html">
+        ← Back to ZipToApk
+      </a>
 
-      <p>
-        This Privacy Policy explains how ZipToApk handles information
-        when you use its GitHub, AI assistance, build, download, and
-        advertising features.
+    </div>
+  </header>
+
+
+  <main class="container">
+
+    <section class="hero">
+
+      <div class="eyebrow">
+        Legal · Privacy
+      </div>
+
+      <h1>
+        Privacy Policy
+      </h1>
+
+      <p class="subtitle">
+        How ZipToApk handles information when you use the application.
       </p>
 
       <div class="updated">
-        Last Updated: September 3, 2026
+        Last updated: September 3, 2026
       </div>
-    </header>
+
+    </section>
 
 
     <div class="notice">
-      <strong>Your data, your actions</strong>
+      <strong>Short version:</strong>
+      ZipToApk is a developer utility for working with selected project files,
+      GitHub repositories and builds, optional Gemini AI assistance, and related
+      developer tools. Project processing is primarily performed on your device,
+      while information is sent to third-party services only as needed for
+      features you choose to use.
+    </div>
+
+
+    <section class="card">
+
+      <h2>1. Information We Handle</h2>
 
       <p>
-        ZipToApk processes project files primarily on your device and
-        sends information to third-party services only when required
-        for features you choose to use. GitHub, Cloudflare, Google
-        Gemini, and Google Mobile Ads may process information as
-        described below.
+        Depending on the features you choose to use, ZipToApk may access,
+        process, or store:
       </p>
+
+      <ul>
+
+        <li>
+          <strong>GitHub account and authorization information</strong>
+          required to connect your GitHub account and use authorized
+          repository and workflow features.
+        </li>
+
+        <li>
+          <strong>Project files</strong>
+          contained in ZIP archives or other project files that you explicitly
+          select for processing.
+        </li>
+
+        <li>
+          <strong>Credentials and configuration</strong>
+          such as GitHub access tokens or a Gemini API key when required by
+          features you configure. App-managed credentials are stored locally
+          using protected Android storage where supported.
+        </li>
+
+        <li>
+          <strong>Optional AI-assistance information</strong>
+          such as selected code or relevant project context when you explicitly
+          use the Gemini-powered AI assistance feature.
+        </li>
+
+        <li>
+          <strong>Repository, workflow, build and artifact information</strong>
+          required to perform requested GitHub operations, display build
+          status, and retrieve available build artifacts.
+        </li>
+
+        <li>
+          <strong>Advertising-related information</strong>
+          that may be processed by the Google Mobile Ads SDK when advertising
+          is enabled, as described below.
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>2. How We Use Information</h2>
+
+      <p>
+        Information is handled only as needed to provide the features you
+        request, including:
+      </p>
+
+      <ul>
+
+        <li>
+          Processing and inspecting project files that you select.
+        </li>
+
+        <li>
+          Checking selected project files for patterns that may indicate
+          exposed credentials or sensitive information.
+        </li>
+
+        <li>
+          Creating or updating repositories, files, commits, and supported
+          GitHub Actions workflows when requested by you.
+        </li>
+
+        <li>
+          Reading build or workflow status and retrieving build artifacts
+          when you request those features.
+        </li>
+
+        <li>
+          Providing optional AI-assisted code analysis or troubleshooting
+          when you choose to use that feature.
+        </li>
+
+        <li>
+          Providing advertising where the application's advertising feature
+          is enabled.
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>3. GitHub &amp; Authentication</h2>
+
+      <p>
+        When you connect GitHub, ZipToApk uses GitHub's authorization services
+        and APIs to perform the GitHub features you request within the
+        permissions you authorize.
+      </p>
+
+      <p>
+        During GitHub OAuth sign-in, limited authorization information is
+        processed through a Cloudflare Worker used for the OAuth flow and
+        server-side token exchange. The GitHub OAuth Client Secret is kept
+        server-side and is not embedded in the Android application.
+      </p>
+
+      <p>
+        Repository files are sent to GitHub only when you choose an operation
+        that requires them, such as pushing or updating project content.
+        Information received and retained by GitHub is subject to GitHub's
+        own policies.
+      </p>
+
+      <p>
+        <a
+          href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub Privacy Statement
+        </a>
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>4. Google Gemini</h2>
+
+      <p>
+        Gemini AI assistance is optional. When you choose to use this feature,
+        selected code, prompts, or relevant project context required for your
+        request may be sent to Google's Gemini service.
+      </p>
+
+      <p>
+        ZipToApk does not send your entire project to Gemini merely because a
+        project is opened. Information is sent when required for an AI request
+        that you initiate.
+      </p>
+
+      <p>
+        Information processed by Google's services is subject to Google's
+        applicable terms and privacy practices.
+      </p>
+
+      <p>
+        <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Google Privacy Policy
+        </a>
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>5. Advertising</h2>
+
+      <p>
+        ZipToApk may display advertisements using Google Mobile Ads (AdMob)
+        when advertising is enabled in the application.
+      </p>
+
+      <p>
+        The Google Mobile Ads SDK may automatically process information such
+        as IP address, app interactions, diagnostic information, and device or
+        advertising identifiers for purposes such as advertising, analytics,
+        and fraud prevention. The exact information processed can depend on
+        the SDK version, device settings, consent settings, and advertising
+        configuration.
+      </p>
+
+      <p>
+        Advertising-related information processed by Google is governed by
+        Google's applicable privacy practices.
+      </p>
+
+      <p>
+        <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Google Privacy Policy
+        </a>
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>6. Project Files &amp; Sensitive Information</h2>
+
+      <p>
+        Project ZIP archives and extracted source files selected in ZipToApk
+        are primarily processed on the user's device.
+      </p>
+
+      <p>
+        Before certain GitHub operations, ZipToApk may perform a
+        security-oriented check for common patterns associated with API keys,
+        access tokens, passwords, private keys, and similar credentials.
+      </p>
+
+      <p>
+        This check is intended to help identify possible accidental exposure
+        but cannot guarantee that every secret or sensitive value will be
+        detected. You remain responsible for reviewing project content before
+        publishing or sending it to a third-party service.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>7. Third-Party Services</h2>
+
+      <p>
+        ZipToApk uses third-party services only where required for the
+        corresponding features you choose to use. These may include:
+      </p>
+
+      <ul>
+
+        <li>
+          <strong>GitHub</strong> — for account authorization, repositories,
+          files, commits, workflows, build information, and artifacts.
+        </li>
+
+        <li>
+          <strong>Cloudflare</strong> — for limited server-side processing
+          required by the GitHub OAuth authorization flow.
+        </li>
+
+        <li>
+          <strong>Google Gemini</strong> — for optional AI-assisted requests
+          initiated by you.
+        </li>
+
+        <li>
+          <strong>Google Mobile Ads (AdMob)</strong> — for advertising and
+          related advertising, analytics, and fraud-prevention processing
+          when advertising is enabled.
+        </li>
+
+      </ul>
+
+      <p>
+        Information sent to a third-party provider is also governed by that
+        provider's applicable terms, privacy policy, and retention practices.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>8. Storage, Retention &amp; Deletion</h2>
+
+      <p>
+        Working project files are primarily processed locally on the device.
+        App-managed credentials and configuration required for enabled features
+        may also be stored locally using Android's available protected storage
+        mechanisms.
+      </p>
+
+      <p>
+        Disconnecting or logging out of a connected service removes applicable
+        app-managed credentials and related local connection information from
+        the device. Removing a locally configured Gemini API key removes that
+        key from the application's local configuration.
+      </p>
+
+      <p>
+        Uninstalling ZipToApk removes app-managed local data subject to
+        Android's storage and backup behavior.
+      </p>
+
+      <p>
+        Data already transmitted to GitHub, Google, Cloudflare, or another
+        third-party service is subject to that provider's own retention and
+        deletion practices and is not necessarily removed when ZipToApk is
+        uninstalled or disconnected.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>9. Data Sharing</h2>
+
+      <p>
+        ZipToApk does not sell users' personal information or project source
+        code.
+      </p>
+
+      <p>
+        Information is shared with third-party services only as necessary for
+        features that you use, such as GitHub repository and build operations,
+        GitHub OAuth processing through Cloudflare, optional Gemini AI
+        assistance, and Google Mobile Ads.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>10. Children's Privacy</h2>
+
+      <p>
+        ZipToApk is a developer-focused utility and is not designed or
+        directed specifically toward children.
+      </p>
+
+      <p>
+        If you believe that information relating to a child has been provided
+        to us inappropriately, you may contact us using the information below.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>11. Security</h2>
+
+      <p>
+        ZipToApk uses reasonable technical measures intended to protect
+        app-managed information. Sensitive credentials stored by the
+        application are kept in protected local storage where supported, and
+        the GitHub OAuth Client Secret is maintained server-side rather than
+        being included in the Android application.
+      </p>
+
+      <p>
+        Communications with supported online services use their secure HTTPS
+        endpoints. However, no method of electronic storage or transmission
+        can be guaranteed to be completely secure.
+      </p>
+
+      <p>
+        Users should review project files carefully and avoid publishing
+        passwords, private keys, API keys, access tokens, or other sensitive
+        credentials in repositories.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>12. Your Choices</h2>
+
+      <p>
+        You control whether to select project files, connect GitHub, configure
+        Gemini AI assistance, or initiate operations that send project
+        information to supported third-party services.
+      </p>
+
+      <p>
+        You may disconnect supported connected services, remove locally stored
+        configuration where the application provides that option, or uninstall
+        the application to remove app-managed local data subject to Android's
+        storage and backup behavior.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>13. Changes to This Policy</h2>
+
+      <p>
+        This Privacy Policy may be updated when ZipToApk's features, service
+        providers, or data practices change. The latest version will be
+        published on this page with the updated date shown above.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>14. Contact &amp; Privacy Requests</h2>
+
+      <p>
+        For questions, privacy concerns, or requests relating to information
+        handled by ZipToApk, contact:
+      </p>
+
+      <p>
+        <a
+          class="email"
+          href="mailto:ziptoapk.support@gmail.com"
+        >
+          ziptoapk.support@gmail.com
+        </a>
+      </p>
+
+    </section>
+
+
+    <div class="contact">
+
+      <p>
+        Official privacy-policy page for ZipToApk
+      </p>
+
+      <p>
+        <a href="mailto:ziptoapk.support@gmail.com">
+          ziptoapk.support@gmail.com
+        </a>
+      </p>
+
     </div>
-
-
-    <div class="content">
-
-      <!-- 1 -->
-      <section class="section">
-        <h2>1. Information We Handle</h2>
-
-        <h3>GitHub Credentials</h3>
-        <p>
-          GitHub Personal Access Tokens (PATs), GitHub OAuth access
-          tokens, and user-provided Gemini API keys may be stored
-          locally on the Android device using protected storage with
-          Android Keystore AES-256-GCM encryption.
-        </p>
-
-        <h3>Project Files</h3>
-        <p>
-          Project ZIP archives and extracted project/source files are
-          processed locally by ZipToApk. When you choose to push or
-          update a project, selected files are transmitted to GitHub
-          through GitHub's official APIs.
-        </p>
-
-        <h3>GitHub Account and Repository Information</h3>
-        <p>
-          ZipToApk accesses the GitHub account and repository
-          information required for the GitHub features you choose to
-          use. This may include information needed for repositories,
-          files, branches, commits, GitHub Actions, build status, and
-          build artifacts.
-        </p>
-
-        <h3>GitHub OAuth</h3>
-        <p>
-          During GitHub OAuth sign-in, authorization information and
-          the one-time authorization code may pass through the
-          application's Cloudflare Worker. This allows the GitHub
-          OAuth Client Secret to remain off the Android device.
-        </p>
-
-        <p>
-          The Cloudflare Worker is used as an OAuth broker and
-          token-exchange service. It is not used as general
-          project-source-code storage.
-        </p>
-
-        <h3>Third-Party Services</h3>
-        <p>
-          GitHub, Cloudflare, Google Gemini, and Google Mobile Ads may
-          process information required to provide features that you
-          choose to use.
-        </p>
-      </section>
-
-
-      <!-- 2 -->
-      <section class="section">
-        <h2>2. How We Use and Process Information</h2>
-
-        <p>
-          ZipToApk uses information to provide the application
-          functionality requested by the user.
-        </p>
-
-        <ul>
-          <li>
-            Create and update GitHub repositories, files, branches,
-            and commits.
-          </li>
-
-          <li>
-            Read GitHub Actions and build status information.
-          </li>
-
-          <li>
-            Access GitHub Actions build artifacts when requested.
-          </li>
-
-          <li>
-            Process selected code or context with Google Gemini when
-            the user invokes the AI assistant.
-          </li>
-
-          <li>
-            Maintain a limited recent project history/checkpoint list
-            locally on the device.
-          </li>
-        </ul>
-
-        <p>
-          ZipToApk does not automatically send all project files to
-          Google Gemini. Only the code or context selected or required
-          for an AI request is processed for that request.
-        </p>
-      </section>
-
-
-      <!-- 3 -->
-      <section class="section">
-        <h2>3. Project and APK Downloads</h2>
-
-        <p>
-          ZipToApk may download project archives or GitHub Actions
-          build artifacts from repositories authorized by the user.
-        </p>
-
-        <p>
-          When an APK build artifact is downloaded, the application
-          processes and extracts it locally and presents an explicit
-          installation action to the user.
-        </p>
-
-        <p>
-          ZipToApk does not silently install APK files and does not
-          use this functionality to silently self-update the ZipToApk
-          application.
-        </p>
-      </section>
-
-
-      <!-- 4 -->
-      <section class="section">
-        <h2>4. Local Project History</h2>
-
-        <p>
-          ZipToApk may keep a limited recent project history or
-          checkpoint list locally on the device to display recent
-          project activity.
-        </p>
-
-        <p>
-          This history contains feature-related metadata and is not a
-          developer-hosted backup of project source code.
-        </p>
-      </section>
-
-
-      <!-- 5 -->
-      <section class="section">
-        <h2>5. Advertising</h2>
-
-        <p>
-          ZipToApk may display advertisements using Google Mobile Ads
-          (AdMob).
-        </p>
-
-        <p>
-          When the Google Mobile Ads SDK is used, Google may
-          automatically process information such as IP address,
-          advertising or device identifiers where applicable, app or
-          user interactions such as app launches and ad interactions,
-          and diagnostic or performance information.
-        </p>
-
-        <p>
-          Such information may be processed for advertising, analytics,
-          fraud prevention, and SDK operation according to Google's
-          applicable policies and user or device settings.
-        </p>
-
-        <p>
-          Advertising availability is controlled by the application's
-          configured advertising settings.
-        </p>
-      </section>
-
-
-      <!-- 6 -->
-      <section class="section">
-        <h2>6. Third-Party Services</h2>
-
-        <h3>GitHub</h3>
-        <p>
-          GitHub is used for authorized account, repository, file,
-          branch, commit, GitHub Actions, and build-artifact
-          functionality.
-        </p>
-
-        <h3>Cloudflare</h3>
-        <p>
-          The application's Cloudflare Worker is used for GitHub OAuth
-          authorization and server-side token exchange. It is not used
-          as general project-source-code storage.
-        </p>
-
-        <h3>Google Gemini</h3>
-        <p>
-          Google Gemini may receive selected code or context when the
-          user invokes AI assistance.
-        </p>
-
-        <h3>Google Mobile Ads (AdMob)</h3>
-        <p>
-          Google Mobile Ads provides advertising and may process
-          advertising-related device and interaction information.
-        </p>
-      </section>
-
-
-      <!-- 7 -->
-      <section class="section">
-        <h2>7. Storage, Retention and Deletion</h2>
-
-        <ul>
-          <li>
-            Logout or Disconnect removes locally stored credentials
-            and app-managed account or configuration data according to
-            the application's implemented behavior.
-          </li>
-
-          <li>
-            Clearing Gemini configuration removes the locally stored
-            Gemini API key.
-          </li>
-
-          <li>
-            Uninstalling the application removes its local application
-            data subject to Android storage and backup behavior.
-          </li>
-
-          <li>
-            A limited recent project history or checkpoint list may be
-            stored locally on the device.
-          </li>
-
-          <li>
-            Information already transmitted to GitHub, Google,
-            Cloudflare, or another third-party provider is subject to
-            that provider's own retention and deletion policies.
-          </li>
-        </ul>
-      </section>
-
-
-      <!-- 8 -->
-      <section class="section">
-        <h2>8. Security</h2>
-
-        <p>
-          Sensitive credentials stored locally by ZipToApk are
-          protected using Android Keystore AES-256-GCM encryption.
-        </p>
-
-        <p>
-          Supported network communication uses HTTPS and the secure
-          API mechanisms provided by the relevant services where
-          applicable.
-        </p>
-
-        <p>
-          The GitHub OAuth Client Secret is kept server-side in the
-          Cloudflare Worker rather than embedded in the Android
-          application.
-        </p>
-      </section>
-
-
-      <!-- 9 -->
-      <section class="section">
-        <h2>9. Children</h2>
-
-        <p>
-          ZipToApk is a developer-focused application and is not
-          specifically directed to children.
-        </p>
-      </section>
-
-
-      <!-- 10 -->
-      <section class="section">
-        <h2>10. External Privacy Information</h2>
-
-        <p>
-          The services used by ZipToApk may have their own privacy
-          policies describing their handling of information.
-        </p>
-
-        <div class="links">
-          <a
-            class="link-chip"
-            href="https://policies.google.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Google Privacy Policy
-          </a>
-
-          <a
-            class="link-chip"
-            href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub Privacy Statement
-          </a>
-
-          <a
-            class="link-chip"
-            href="https://www.cloudflare.com/privacypolicy/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Cloudflare Privacy Policy
-          </a>
-        </div>
-      </section>
-
-
-      <!-- 11 -->
-      <section class="section">
-        <h2>11. Policy Changes</h2>
-
-        <p>
-          We may update this Privacy Policy when the application's
-          data practices or relevant requirements change. Updated
-          information will be published on this page and, where
-          appropriate, reflected in the application.
-        </p>
-      </section>
-
-
-      <!-- 12 -->
-      <section class="section">
-        <h2>12. Support and Privacy Requests</h2>
-
-        <p>
-          If you have a question about this Privacy Policy or how
-          ZipToApk handles information, you can contact us using the
-          information below.
-        </p>
-
-        <div class="contact">
-
-          <div class="contact-row">
-            <span class="contact-label">Support Email</span>
-            <a href="mailto:ziptoapk.support@gmail.com">
-              ziptoapk.support@gmail.com
-            </a>
-          </div>
-
-          <div class="contact-row">
-            <span class="contact-label">Privacy Policy</span>
-            <a
-              href="https://ziptoapk.in/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              https://ziptoapk.in/privacy-policy
-            </a>
-          </div>
-
-        </div>
-      </section>
-
-    </div>
-
-
-    <footer>
-      &copy; 2026 ZipToApk. All rights reserved.
-    </footer>
 
   </main>
+
+
+  <footer>
+    © 2026 ZipToApk · Privacy Policy
+  </footer>
 
 </body>
 </html>
